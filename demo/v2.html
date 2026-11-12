@@ -13091,8 +13091,8 @@ function seedState(){
       {t:'2026-11-10 09:15',e:'结算单确认',to:'ST261101 · ¥1,079',by:'运营方'}
     ],
     ui:{
-      slots:{A:{role:'customer',page:'home',cu:'CU01',cat:'全部',q:'',sort:'default',modal:null,thread:null,adminTab:null,sel:[],chatDraft:''},
-             B:{role:'agent',page:'work',agent:'AG02',filter:'全部',q:'',modal:null,thread:null,adminTab:'agents',sel:[],chatDraft:'',settleSel:[]}},
+      slots:{A:{role:'customer',page:'home',cu:'CU01',agent:'AG01',cat:'全部',q:'',sort:'default',modal:null,thread:null,adminTab:null,sel:[],psel:[],chatDraft:'',form:{who:'王老板 · 南关××超市',tel:'13800001111',note:''}},
+             B:{role:'agent',page:'work',cu:'CU01',agent:'AG02',filter:'全部',q:'',modal:null,thread:null,adminTab:'agents',sel:[],psel:[],chatDraft:'',settleSel:[],form:{who:'王老板 · 南关××超市',tel:'13800001111',note:''}}},
       rail:{accent:'#D8B071',fs:1,radius:12,dense:false,glow:.55,speed:1,particles:70,gravity:.055,trails:.16,
             ambient:true,grain:true,sound:true,autoReply:true,sky:true,bloom:true,showB:true},
       bindFlash:null,undo:null,typing:{},demo:null
@@ -13117,7 +13117,7 @@ const order = no => S.orders.find(o=>o.no===no);
 const settle = id => S.settlements.find(s=>s.id===id);
 const thread = id => S.threads.find(t=>t.id===id);
 const slotA = ()=>S.ui.slots.A, slotB = ()=>S.ui.slots.B;
-function me(sl){return sl.role==='customer'?cust(sl.cu):sl.role==='agent'?agent(sl.agent):{id:'OP',name:'长春宏伟烟花 · 运营方',who:'张宏伟',hue:38}}
+function me(sl){return sl.role==='customer'?(cust(sl.cu)||{who:'客户',name:'客户'}):sl.role==='agent'?(agent(sl.agent)||{who:'代理',name:'代理'}):{id:'OP',name:'长春宏伟烟花 · 运营方',who:'张宏伟',hue:38}}
 function orderAmt(o){return o.items.reduce((s,i)=>s+i.price*i.qty,0)}
 function itemName(i){return i.kid?(pkg(i.kid)||{name:'（套餐已删除）'}).name:(prod(i.pid)||{name:'（商品已删除）'}).name}
 function itemHue(i){const x=i.kid?pkg(i.kid):prod(i.pid);return x?x.hue:38}
@@ -14018,6 +14018,14 @@ function formData(){const o={};$$('#modalHost [data-form]').forEach(el=>{o[el.da
 
 
 /* ======================= 事件 ======================= */
+function normalizeSlot(sl,role){
+  sl.role=role||sl.role;
+  if(!cust(sl.cu))sl.cu=(S.customers[0]||{}).id;
+  if(!agent(sl.agent))sl.agent=((S.agents.find(a=>a.on)||S.agents[0])||{}).id;
+  if(!sl.form){const c=cust(sl.cu);sl.form={who:c?c.who:'',tel:c?c.tel:'',note:''}}
+  if(!sl.sel)sl.sel=[];if(!sl.psel)sl.psel=[];if(!sl.filter)sl.filter='全部';
+  sl.page=TABS[sl.role][0].k;sl.modal=null;sl.thread=null;sl.sel=[];sl.psel=[];sl.q='';sl.filter='全部';
+}
 function slotOf(el){
   if(!el)return 'A';
   if(el.dataset&&el.dataset.slot)return el.dataset.slot;
@@ -14031,7 +14039,7 @@ document.addEventListener('click',e=>{
   if(a==='close-bg'&&e.target!==el)return;
   if(el.dataset.stop)e.stopPropagation();
   switch(a){
-    case 'role':{sl.role=el.dataset.role;sl.page=TABS[sl.role][0].k;sl.modal=null;sl.thread=null;sl.sel=[];sl.psel=[];sl.q='';sl.filter='全部';renderSlot(k);Sound.play('tap');break}
+    case 'role':{normalizeSlot(sl,el.dataset.role);renderDock();renderSlot(k);Sound.play('tap');break}
     case 'nav':{sl.page=el.dataset.page;sl.modal=null;if(sl.page!=='chat')sl.thread=null;if(sl.page==='chat')Sound.play('tap');renderSlot(k);break}
     case 'cat':{sl.cat=el.dataset.cat;sl.page='goods';renderSlot(k);Sound.play('tap');break}
     case 'clear-search':{sl.q='';renderSlot(k);break}
@@ -14473,7 +14481,7 @@ function ctl(name,el){
     case 'accent':{R.accent=el.value;setVar();const av=$('#accentV');if(av)av.textContent=el.value.toUpperCase();save();break}
     case 'swatch':{R.accent=el.dataset.c;setVar();renderRail();save();Sound.play('tap');break}
     case 'fs':case 'radius':case 'glow':case 'speed':case 'particles':case 'gravity':case 'trails':{R[name]=num(el.value);setVar();const v=$('#'+name+'V');if(v)v.textContent=name==='fs'?R.fs.toFixed(2)+'×':name==='radius'?R.radius+'px':name==='speed'?R.speed.toFixed(1)+'×':name==='gravity'?R.gravity.toFixed(3):(name==='glow'||name==='trails')?Math.round(R[name]*100)+'%':R[name];if(name==='fs'||name==='radius'||name==='dense')renderAll();save();break}
-    case 'slotA':case 'slotB':{const k=name.slice(-1),sl=S.ui.slots[k];sl.role=el.value;sl.page=TABS[sl.role][0].k;sl.thread=null;sl.modal=null;sl.sel=[];sl.psel=[];sl.q='';sl.filter='全部';renderDock();renderSlot(k);break}
+    case 'slotA':case 'slotB':{const k=name.slice(-1),sl=S.ui.slots[k];normalizeSlot(sl,el.value);renderDock();renderSlot(k);break}
     case 'acctA':case 'acctB':{const k=name.slice(-1),sl=S.ui.slots[k];if(sl.role==='customer'){sl.cu=el.value;const c=cust(sl.cu);sl.form={who:c.who,tel:c.tel,note:''}}else if(sl.role==='agent')sl.agent=el.value;sl.thread=null;sl.sel=[];renderDock();renderSlot(k);break}
     case 'fire':{Sky.burst();Sound.unlock();break}
     case 'undo':{doUndo();break}
@@ -14521,7 +14529,7 @@ document.addEventListener('pointerdown',()=>Sound.unlock(),{once:true});
 /* ======================= 启动 ======================= */
 function boot(){
   load();
-  ['A','B'].forEach(k=>{const sl=S.ui.slots[k];const c=cust(sl.cu)||S.customers[0];sl.cu=c.id;if(!sl.form)sl.form={who:c.who,tel:c.tel,note:''};if(!sl.sel)sl.sel=[];if(!sl.filter)sl.filter='全部'});
+  ['A','B'].forEach(k=>{const sl=S.ui.slots[k];const role=sl.role;normalizeSlot(sl,role);sl.page=role==='customer'?'home':role==='agent'?'work':'overview'});
   const m=String(location.hash||'').match(/agent=([A-Za-z0-9_-]+)/);
   $('#markBurst').innerHTML=burst(2026,42,16).replace(/<\/?svg[^>]*>/g,'');
   applyRail();
