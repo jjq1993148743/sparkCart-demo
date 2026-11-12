@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SparkCart 烟花小程序 · 三角色演示原型</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(circle at 18% 0%,#2b1836,#0c0a12 62%);color:#f5f2ea;min-height:100vh;padding:20px 12px 34px}
+.stage{max-width:470px;margin:0 auto;text-align:center}
+.h1{font-size:19px;font-weight:700;letter-spacing:1px}
+.h1 small{display:block;font-size:11px;font-weight:400;color:#a69db8;margin-top:5px;letter-spacing:0}
+.roles{display:flex;gap:7px;background:#1b1726;padding:6px;border-radius:14px;margin:14px auto 10px;border:1px solid #322b45}
+.roles button{flex:1;border:0;background:transparent;color:#a69db8;padding:10px 2px;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600}
+.roles button.on{background:linear-gradient(135deg,#e64340,#a9222b);color:#fff;box-shadow:0 4px 14px rgba(230,67,64,.35)}
+.flow{font-size:10px;color:#9a92ac;line-height:1.7;background:#191424;border:1px solid #2c2540;border-radius:10px;padding:8px 10px;margin-bottom:12px;text-align:left}
+.flow b{color:#f0b64b}
+.phone{width:390px;max-width:100%;height:770px;background:#14111d;border:9px solid #2a2438;border-radius:38px;margin:0 auto;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.6);position:relative}
+.topbar{height:64px;background:linear-gradient(135deg,#1e1829,#271a2d);display:flex;align-items:center;justify-content:space-between;padding:13px 16px 9px;border-bottom:1px solid #2f2740;flex-shrink:0}
+.topbar .t{font-size:15px;font-weight:700}
+.topbar .s{font-size:11px;color:#f0b64b;margin-top:2px}
+.demo-tag{font-size:10px;color:#241a0d;background:#f0b64b;padding:3px 8px;border-radius:20px;font-weight:700}
+.screen{flex:1;overflow-y:auto;padding:14px 14px 22px;text-align:left;scrollbar-width:thin}
+.screen::-webkit-scrollbar{width:4px}
+.screen::-webkit-scrollbar-thumb{background:#3a3150;border-radius:4px}
+.tabbar{height:62px;background:#1b1626;border-top:1px solid #2f2740;display:flex;flex-shrink:0}
+.tabbar button{flex:1;border:0;background:transparent;color:#8d86a0;font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.tabbar button span{font-size:17px;line-height:1}
+.tabbar button.on{color:#f0b64b}
+.hero{border-radius:16px;padding:17px;background:linear-gradient(135deg,#8e1f26,#c33a2c 55%,#e08b32);position:relative;overflow:hidden;margin-bottom:13px}
+.hero:after{content:"✦";position:absolute;right:-6px;top:-26px;font-size:112px;color:rgba(255,255,255,.09)}
+.hero h2{font-size:17px;line-height:1.45;letter-spacing:.5px}
+.hero p{font-size:10px;opacity:.85;margin-top:7px}
+.card{background:#211c2e;border:1px solid #322b45;border-radius:14px;padding:13px;margin-bottom:11px}
+.card.flat{padding:11px}
+.sec{font-size:14px;font-weight:700;margin:15px 0 9px;display:flex;justify-content:space-between;align-items:center}
+.sec small{font-size:10px;color:#8d86a0;font-weight:400}
+.muted{color:#9a92ac;font-size:11px;line-height:1.65}
+.gold{color:#f0b64b}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.thumb{height:92px;border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;font-size:38px}
+.thumb i{position:absolute;left:6px;bottom:5px;font-style:normal;font-size:10px;background:rgba(0,0,0,.45);padding:2px 6px;border-radius:5px;color:#fff}
+.pname{font-size:12px;font-weight:600;margin:7px 0 3px;line-height:1.35}
+.pcode{font-size:10px;color:#9a92ac}
+.btn{border:0;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#e64340,#b3252a);color:#fff;width:100%}
+.btn.ghost{background:#2c2540;color:#e9e3f2;border:1px solid #3d3456}
+.btn.gold{background:linear-gradient(135deg,#f0b64b,#d08b25);color:#241a0d}
+.btn.mini{width:auto;padding:6px 10px;font-size:11px;border-radius:8px}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chips{display:flex;gap:7px;overflow-x:auto;margin-bottom:11px;padding-bottom:2px}
+.chip{flex-shrink:0;font-size:11px;padding:6px 12px;border-radius:20px;background:#2a2339;color:#a69db8;border:1px solid #3a3150;cursor:pointer}
+.chip.on{background:#f0b64b;color:#241a0d;border-color:#f0b64b;font-weight:700}
+.row{display:flex;align-items:center;gap:9px}
+.row.between{justify-content:space-between}
+.tag{font-size:10px;padding:3px 8px;border-radius:6px;background:#332a48;color:#c9bfe0;white-space:nowrap}
+.tag.a{background:#5a3a1a;color:#ffcf7a}
+.tag.b{background:#1d4a3a;color:#7fe0b0}
+.tag.c{background:#2a3d63;color:#9ec5ff}
+.tag.d{background:#4a2530;color:#ff9aa0}
+.tag.e{background:#4a3a1e;color:#ffd98a}
+.stat{display:flex;gap:8px;margin-bottom:11px}
+.stat div{flex:1;background:#211c2e;border:1px solid #322b45;border-radius:12px;padding:11px 6px;text-align:center}
+.stat b{display:block;font-size:17px;color:#f0b64b;margin-bottom:3px}
+.stat span{font-size:10px;color:#9a92ac}
+.item{background:#211c2e;border:1px solid #322b45;border-radius:12px;padding:11px;margin-bottom:9px}
+.item .ttl{font-size:13px;font-weight:600;margin-bottom:4px}
+.item .sub{font-size:10px;color:#9a92ac;line-height:1.65}
+.qty{display:flex;align-items:center;gap:7px}
+.qty button{width:23px;height:23px;border:0;border-radius:7px;background:#332a48;color:#fff;font-size:14px;cursor:pointer}
+.qty span{font-size:12px;min-width:14px;text-align:center}
+.cb{width:20px;height:20px;border-radius:6px;border:1px solid #5a4d76;background:#191424;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:#241a0d}
+.cb.on{background:#f0b64b;border-color:#f0b64b;font-weight:700}
+label.f{display:block;font-size:11px;color:#a69db8;margin:10px 0 5px}
+input.f,select.f,textarea.f{width:100%;background:#171320;border:1px solid #3a3150;border-radius:9px;padding:10px;color:#f5f2ea;font-size:12px;outline:none;font-family:inherit}
+textarea.f{resize:none;height:64px}
+input.f:focus,select.f:focus,textarea.f:focus{border-color:#f0b64b}
+.qr{width:126px;height:126px;background:#fff;border-radius:10px;padding:7px;margin:9px auto}
+.qr svg{width:100%;height:100%;fill:#171320}
+.notice{font-size:10px;color:#8d86a0;line-height:1.7;background:#1a1624;border-left:2px solid #f0b64b;padding:8px 10px;border-radius:0 8px 8px 0;margin-top:9px}
+.timeline{border-left:2px solid #3a3150;margin:8px 0 0 6px;padding-left:12px}
+.timeline div{font-size:10px;color:#a69db8;margin-bottom:8px;position:relative}
+.timeline div:before{content:"";position:absolute;left:-17px;top:4px;width:7px;height:7px;border-radius:50%;background:#f0b64b}
+.stabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:11px}
+.stab{flex-shrink:0;font-size:10px;padding:6px 10px;border-radius:8px;background:#241e33;color:#a69db8;border:1px solid #362e4a;cursor:pointer}
+.stab.on{background:#3a2f52;color:#f0b64b;border-color:#6a568f}
+.mbg{position:absolute;inset:0;background:rgba(6,4,10,.78);display:flex;align-items:flex-end;z-index:9}
+.modal{width:100%;background:#211c2e;border-radius:20px 20px 0 0;padding:17px 15px 22px;max-height:80%;overflow-y:auto;border-top:1px solid #403654}
+.modal h3{font-size:15px;margin-bottom:10px}
+.close{float:right;font-size:12px;color:#9a92ac;cursor:pointer;padding:2px 6px}
+.toast{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);background:rgba(0,0,0,.9);border:1px solid #4a3f66;color:#fff;font-size:11px;padding:9px 15px;border-radius:20px;z-index:20;white-space:nowrap;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%}
+.toast.show{opacity:1}
+.foot{font-size:10px;color:#8d86a0;margin-top:12px;line-height:1.8}
+.empty{text-align:center;color:#8d86a0;font-size:12px;padding:34px 0}
+.pill{display:inline-block;font-size:9px;padding:2px 7px;border-radius:5px;background:#332a48;color:#c9bfe0;margin-left:5px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="h1">SparkCart · 烟花小程序演示原型<small>客户 / 代理 / 运营方 三套页面 · 测试数据 · 全程不支付不结算</small></div>
+  <div class="roles">
+    <button data-act="role" data-role="customer">客户端</button>
+    <button data-act="role" data-role="agent">代理端</button>
+    <button data-act="role" data-role="admin">运营方端</button>
+  </div>
+  <div class="flow"><b>演示主线：</b>先看客户端产品画册（首页 / 视频 / 产品 / 套餐，项目主角），再走留资闭环：① 加购提交订单 ② 运营方后台确定备货 ③ 代理勾选组账期 ④ 运营方确认结算。<b>按无资质：不线上付款、不做公众号推送</b></div>
+  <div class="phone">
+    <div class="topbar"><div><div class="t" id="rTitle">客户端</div><div class="s" id="rSub">长春宏伟烟花</div></div><div class="demo-tag">演示数据</div></div>
+    <div class="screen" id="screen"></div>
+    <div class="tabbar" id="tabbar"></div>
+    <div class="toast" id="toast"></div>
+    <div id="modalHost"></div>
+  </div>
+  <div class="foot">线上产品画册 · 单文件离线可开 · 数据刷新重置 · 按无烟花类目资质与无认证服务号处理：不线上收款、不做自动推送 · 客户端全程不出现金额</div>
+</div>
+<script>
+const P=[
+ {id:'P115',code:'115',name:'20发笛音发财雷',spec:'6/1 · 24盒/箱',cat:'雷类',price:115,stk:[86,42,18],emoji:'🎆',bg:'linear-gradient(135deg,#7b1f2a,#e0573a)'},
+ {id:'P400',code:'400',name:'16发欢乐雷王',spec:'80/1 · 12盒/箱',cat:'雷类',price:400,stk:[42,20,9],emoji:'🎇',bg:'linear-gradient(135deg,#8a3a12,#e8a13b)'},
+ {id:'P300',code:'300',name:'168发轰天雷',spec:'4/1 · 8盒/箱',cat:'组合',price:300,stk:[18,8,0],emoji:'💥',bg:'linear-gradient(135deg,#3b2263,#b04ad0)'},
+ {id:'P192',code:'192',name:'88发闪光雷',spec:'8/1 · 16盒/箱',cat:'组合',price:192,stk:[64,30,12],emoji:'✨',bg:'linear-gradient(135deg,#123f5c,#3fa7d6)'},
+ {id:'P200',code:'200',name:'48发闪光雷',spec:'8/1 · 16盒/箱',cat:'组合',price:200,stk:[0,16,8],emoji:'🌟',bg:'linear-gradient(135deg,#1c4a3a,#4bc08a)'},
+ {id:'P220',code:'220',name:'36发闪光雷',spec:'18/1 · 10盒/箱',cat:'组合',price:220,stk:[31,14,6],emoji:'🎇',bg:'linear-gradient(135deg,#5c2a55,#d05a9e)'},
+ {id:'P120',code:'120',name:'小黄人儿童烟花',spec:'24盒/箱',cat:'儿童',price:120,stk:[120,60,30],emoji:'🧨',bg:'linear-gradient(135deg,#6b5410,#e8c33c)'},
+ {id:'P140',code:'140',name:'小汽车儿童烟花',spec:'18盒/箱',cat:'儿童',price:140,stk:[75,36,18],emoji:'🚗',bg:'linear-gradient(135deg,#254a6b,#59b6e8)'}
+];
+const PKG=[{name:'开业大吉套餐',desc:'20发笛音发财雷 + 16发欢乐雷王 + 88发闪光雷',price:688,emoji:'🏮'},{name:'婚庆全套',desc:'168发轰天雷 + 48发闪光雷 + 36发闪光雷',price:699,emoji:'💍'},{name:'儿童安全套餐',desc:'小黄人 + 小汽车',price:238,emoji:'🧒'}];
+const AG=[{id:'A01',name:'李宏伟',tel:'138****0001',on:1,wx:'已绑定 · 李宏伟'},{id:'A02',name:'王春梅',tel:'138****0002',on:1,wx:'已绑定 · 王春梅'},{id:'A03',name:'张立新',tel:'138****0003',on:0,wx:'未绑定'},{id:'A00',name:'运营方自营',tel:'—',on:1,wx:'已绑定 · 运营方'}];
+const ORD=[
+ {no:'NO20261112001',agent:'A01',who:'王老板',tel:'13800001111',note:'今晚3点送到南关区××超市',status:'已提交',settle:'未出账',date:'2026-11-12 09:20',mine:1,items:[{name:'20发笛音发财雷',spec:'单件',qty:1,price:115},{name:'16发欢乐雷王',spec:'单件',qty:1,price:400}]},
+ {no:'NO20261111002',agent:'A01',who:'王老板',tel:'13800001111',note:'周末库房自提',status:'已确认',settle:'未出账',date:'2026-11-11 15:42',mine:1,items:[{name:'88发闪光雷',spec:'单组',qty:2,price:192}]},
+ {no:'NO20261109003',agent:'A01',who:'赵经理',tel:'13800003333',note:'婚礼用，已电话确认',status:'已完成',settle:'已结算',date:'2026-11-09 11:08',items:[{name:'开业大吉套餐',spec:'套餐',qty:1,price:688}]},
+ {no:'NO20261110004',agent:'A01',who:'李婶',tel:'13800002222',note:'朝阳区，等电话',status:'已确认',settle:'已出账',date:'2026-11-10 18:30',items:[{name:'36发闪光雷',spec:'单件',qty:1,price:220}]},
+ {no:'NO20261108005',agent:'A02',who:'孙老板',tel:'13800004444',note:'二道区，等报价',status:'已提交',settle:'未出账',date:'2026-11-08 10:11',items:[{name:'168发轰天雷',spec:'单件',qty:1,price:300}]},
+ {no:'NO20261107006',agent:'A02',who:'周姐',tel:'13800005555',note:'自提',status:'已完成',settle:'已出账',date:'2026-11-07 14:20',items:[{name:'儿童安全套餐',spec:'套餐',qty:1,price:238}]},
+ {no:'NO20261028007',agent:'A01',who:'吴总',tel:'13800006666',note:'老客户，月结',status:'已完成',settle:'已结算',date:'2026-10-28 09:05',items:[{name:'婚庆全套',spec:'套餐',qty:1,price:699}]},
+ {no:'NO20261111008',agent:'A00',who:'散客刘先生',tel:'13800007777',note:'自然流量进店',status:'已确认',settle:'未出账',date:'2026-11-11 20:15',items:[{name:'小黄人儿童烟花',spec:'单件',qty:2,price:120}]},
+ {no:'NO20261112009',agent:'A01',who:'陈老板',tel:'13800008888',note:'经开区，先留个单',status:'已提交',settle:'未出账',date:'2026-11-12 10:02',items:[{name:'48发闪光雷',spec:'单件',qty:1,price:200}]}
+];
+const SET=[
+ {no:'S20261111001',agent:'A01',orders:['NO20261110004'],amount:220,status:'待结算',date:'2026-11-11'},
+ {no:'S20261109001',agent:'A01',orders:['NO20261109003'],amount:688,status:'已结算',date:'2026-11-09'},
+ {no:'S20261108001',agent:'A02',orders:['NO20261107006'],amount:238,status:'已结算',date:'2026-11-08'}
+];
+const TABS={
+ customer:[{k:'home',n:'首页',i:'🏠'},{k:'goods',n:'产品',i:'🎆'},{k:'cart',n:'购物车',i:'🛒'},{k:'orders',n:'订单',i:'📋'},{k:'my',n:'我的',i:'👤'}],
+ agent:[{k:'dash',n:'工作台',i:'📊'},{k:'orders',n:'订单',i:'📋'},{k:'settle',n:'结算',i:'💰'},{k:'customers',n:'客户',i:'👥'},{k:'promo',n:'推广',i:'📲'}],
+ admin:[{k:'overview',n:'概览',i:'📊'},{k:'orders',n:'订单',i:'📋'},{k:'settle',n:'结算',i:'💰'},{k:'products',n:'商品',i:'🎇'},{k:'manage',n:'管理',i:'⚙️'}]
+};
+const ROLE={customer:['客户端','长春宏伟烟花'],agent:['代理端','李宏伟 · A01'],admin:['运营方端','总店 · 管理员']};
+const S={role:'customer',page:'home',cat:'全部',filterAgent:'全部',adminTab:'agents',cart:[],selected:new Set(),modal:null,
+ slogan:'长春宏伟烟花 · 正规货源 · 一站配齐',
+ profile:{who:'王老板',tel:'13800001111'},
+ form:{who:'',tel:'',note:'',sub:1},
+ products:P.map(x=>({...x,stk:[...x.stk],on:1})),packages:PKG.map(x=>({...x})),agents:AG.map(x=>({...x})),
+ orders:ORD.map(x=>({...x,items:x.items.map(i=>({...i}))})),settlements:SET.map(x=>({...x,orders:[...x.orders]})),
+ notify:[{t:'09:20',e:'新订单提交',to:'代理 李宏伟 + 运营方（登录后台查看）',c:'后台站内留痕'},{t:'09:21',e:'订单确认备货',to:'客户 赵经理（自行查看订单状态）',c:'后台站内留痕'}],
+ _key:''};
+const amt=o=>o.items.reduce((s,i)=>s+i.price*i.qty,0);
+const money=n=>'¥'+Number(n).toFixed(0);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const stTag=s=>`<span class="tag ${{已提交:'a',已确认:'b',已完成:'c',已取消:'d'}[s]||''}">${s}</span>`;
+const seTag=s=>`<span class="tag ${{未出账:'',已出账:'e',已结算:'b'}[s]||''}">${s}</span>`;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window._t);window._t=setTimeout(()=>t.classList.remove('show'),2100)}
+function pushNotify(e,to){S.notify.unshift({t:'刚刚',e,to,c:'后台站内留痕 · 线下微信/电话沟通'});toast(e+' → '+to+'（演示：后台留痕，线下沟通）')}
+function qr(seed){let s=seed,c='';const r=()=>{s=(s*9301+49297)%233280;return s/233280};for(let y=0;y<21;y++)for(let x=0;x<21;x++){const k=(x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13);let on;if(k){const a=x>13?x-14:x,b=y>13?y-14:y;on=(a===0||a===6||b===0||b===6||(a>=2&&a<=4&&b>=2&&b<=4))}else on=r()>.52;if(on)c+=`<rect x="${x}" y="${y}" width="1" height="1"/>`}return `<svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">${c}</svg>`}
+function thumb(p){return `<div class="thumb" style="background:${p.bg}"><span>${p.emoji}</span><i>编号 ${p.code}</i></div>`}
+function pcard(p){const off=p.on===0;return `<div class="card flat" style="margin:0" data-act="product" data-id="${p.id}">${thumb(p)}<div class="pname">${p.name}</div><div class="pcode">${p.spec}</div><div class="row between" style="margin-top:7px"><span class="tag ${off?'d':''}">${off?'已下架':'可加购'}</span><button class="btn mini ${off?'ghost':''}" data-act="add" data-id="${p.id}" ${off?'disabled':''}>加入</button></div></div>`}
+function note_(txt){return `<div class="notice">${txt}</div>`}
+function orderCard(o,showMoney,selectable){
+ const cb=selectable?`<div class="cb ${S.selected.has(o.no)?'on':''}" data-act="select" data-no="${o.no}">${S.selected.has(o.no)?'✓':''}</div>`:'';
+ const inner=`<div style="flex:1;min-width:0" data-act="order" data-no="${o.no}"><div class="row between"><span class="ttl">${o.who} <span style="font-size:10px;color:#9a92ac">${o.tel}</span></span>${stTag(o.status)}</div><div class="sub">${o.no} · ${o.date}</div><div class="sub">${o.items.map(i=>i.name+'（'+i.spec+'）×'+i.qty).join('、')}</div><div class="row between" style="margin-top:6px"><span class="sub">备注：${esc(o.note)||'无'}${showMoney?' · 代理 '+o.agent+' · '+seTag(o.settle):''}</span>${showMoney?`<b class="gold" style="font-size:12px">${money(amt(o))}</b>`:''}</div></div>`;
+ return `<div class="item row">${cb}${inner}</div>`;
+}
+function renderCustomer(){
+ const p=S.page;
+ if(p==='home')return `<div class="hero"><h2>${esc(S.slogan)}</h2><p>烟花效果视频 · 产品 · 套餐 · 选品下单</p></div>
+ <div class="card" data-act="video"><div class="row between"><div><div style="font-size:13px;font-weight:700">▶ 烟花效果实拍</div><div class="muted" style="margin-top:4px">商户提供视频，云存储播放（演示占位）</div></div><span style="font-size:25px">🎥</span></div></div>
+ <div class="chips">${['全部','雷类','组合','儿童'].map(c=>`<div class="chip" data-act="cat" data-cat="${c}">${c}</div>`).join('')}</div>
+ <div class="sec">热销产品 <small class="gold" data-act="nav" data-page="goods" style="cursor:pointer">全部 ›</small></div><div class="grid2">${S.products.filter(x=>x.on).slice(0,4).map(pcard).join('')}</div>
+ <div class="sec">推荐套餐</div>${S.packages.map(k=>`<div class="card row"><span style="font-size:25px">${k.emoji}</span><div style="flex:1;margin-left:10px"><div style="font-size:13px;font-weight:700">${k.name}</div><div class="muted" style="margin-top:3px">${k.desc}</div></div></div>`).join('')}
+ ${note_('本小程序只做选品登记，不收取任何款项；核对货品与结算均在线下完成。客户端全程不显示金额。')}`;
+ if(p==='goods'){const cs=['全部',...new Set(S.products.map(x=>x.cat))];const list=S.products.filter(x=>S.cat==='全部'||x.cat===S.cat);return `<div class="chips">${cs.map(c=>`<div class="chip ${S.cat===c?'on':''}" data-act="cat" data-cat="${c}">${c}</div>`).join('')}</div><div class="grid2">${list.map(pcard).join('')}</div>${note_('库存按单品 / 单组 / 单件三层独立计算；某层缺货只禁该层数量选择，商品仍然展示。')}`}
+ if(p==='cart'||p==='checkout'){
+  const rows=S.cart.map(c=>{const x=S.products.find(y=>y.id===c.id);return `<div class="item row"><div style="width:42px;height:42px;border-radius:8px;background:${x.bg};display:flex;align-items:center;justify-content:center;font-size:20px">${x.emoji}</div><div style="flex:1;margin-left:9px"><div class="ttl">${x.name}</div><div class="sub">${c.spec} · ${x.spec}</div></div><div class="qty"><button data-act="qty" data-id="${c.id}" data-spec="${c.spec}" data-d="-1">−</button><span>${c.qty}</span><button data-act="qty" data-id="${c.id}" data-spec="${c.spec}" data-d="1">＋</button></div></div>`}).join('');
+  if(p==='cart')return `<div class="sec">购物车 <small>${S.cart.reduce((s,c)=>s+c.qty,0)} 件</small></div>${rows||'<div class="empty">购物车还是空的</div>'}${rows?'<button class="btn" data-act="nav" data-page="checkout" style="margin-top:10px">去提交订单</button>':''}${note_('购物车不显示小计、不显示金额。')}`;
+  return `<div class="sec">填写提货信息</div><div class="card"><label class="f">姓名 / 超市名头（不限字数）</label><input class="f" data-field="who" value="${esc(S.form.who)}" placeholder="姓名或超市名头"><label class="f">电话 <span class="pill">首次填写后存入客户档案，后续沿用，可单笔修改</span></label><input class="f" data-field="tel" value="${esc(S.form.tel)}" placeholder="11 位手机号"><label class="f">备注（引导：可写送货地点与时间）</label><textarea class="f" data-field="note" placeholder="例如：预定今晚 3 点把货送到某某地方">${esc(S.form.note)}</textarea><div class="row" style="margin-top:11px"><div class="cb ${S.form.sub?'on':''}" data-act="sub">${S.form.sub?'✓':''}</div><span class="muted">二期可选：订阅消息；当前不做自动推送，请自行查看订单状态</span></div></div><div class="sec">本次选品</div><div class="card">${S.cart.map(c=>{const x=S.products.find(y=>y.id===c.id);return `<div class="row between" style="margin-bottom:6px"><span style="font-size:12px">${x.name}（${c.spec}）</span><span class="muted">× ${c.qty}</span></div>`}).join('')}</div><button class="btn" data-act="submit">提交订单</button>${note_('没有地址字段、没有金额、没有支付方式。提交后进后台订单库，代理与运营方登录后台查看；成功页提示可截图发商户微信 / 电话联系，不发自动推送。')}`;
+ }
+ if(p==='orders'){const mine=S.orders.filter(o=>o.mine);return `<div class="sec">我的订单 <small>${mine.length} 单</small></div>${mine.map(o=>orderCard(o,false,false)).join('')||'<div class="empty">还没有订单</div>'}${note_('订单状态：已提交(待确认) → 已确认(备货中) → 已完成 / 已取消。客户侧不显示金额。')}`}
+ return `<div class="card row"><div style="width:44px;height:44px;border-radius:50%;background:#3a2b52;display:flex;align-items:center;justify-content:center;font-size:21px">👤</div><div style="margin-left:10px"><div style="font-size:14px;font-weight:700">${esc(S.profile.who)}</div><div class="muted">${esc(S.profile.tel)} · 微信已登录</div></div></div><div class="sec">客户档案</div><div class="card"><div class="row between" style="margin-bottom:7px"><span class="muted">姓名</span><span style="font-size:12px">${esc(S.profile.who)}</span></div><div class="row between" style="margin-bottom:7px"><span class="muted">电话</span><span style="font-size:12px">${esc(S.profile.tel)}</span></div><div class="row between"><span class="muted">服务代理</span><span style="font-size:12px">李宏伟（A01）</span></div></div><div class="sec">联系商户</div><div class="card" style="text-align:center"><div class="qr">${qr(7788)}</div><div style="font-size:12px">长按识别加好友，线下沟通</div><div class="muted" style="margin-top:4px">演示用二维码占位</div></div>`;
+}
+function renderAgent(){
+ const p=S.page,mine=S.orders.filter(o=>o.agent==='A01'),valid=mine.filter(o=>o.status!=='已取消');
+ const total=valid.reduce((s,o)=>s+amt(o),0),wait=valid.filter(o=>o.settle!=='已结算').reduce((s,o)=>s+amt(o),0),done=total-wait;
+ if(p==='dash')return `<div class="stat"><div><b>${mine.length}</b><span>我的订单</span></div><div><b>${money(total)}</b><span>销售金额</span></div><div><b>${S.settlements.filter(x=>x.agent==='A01'&&x.status==='待结算').length}</b><span>待结算单</span></div></div><div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:9px">金额统计（仅自己名下）</div><div class="row between" style="margin-bottom:7px"><span class="muted">累计销售额</span><b class="gold">${money(total)}</b></div><div class="row between" style="margin-bottom:7px"><span class="muted">待结算</span><b>${money(wait)}</b></div><div class="row between"><span class="muted">已结算</span><b>${money(done)}</b></div></div><div class="sec">快捷操作</div><div class="grid2"><button class="btn ghost" data-act="nav" data-page="orders">看我的订单</button><button class="btn ghost" data-act="nav" data-page="settle">账期结算</button></div>${note_('全系统只有一个价格（运营方统一定），代理与运营方同价、不设代理价；提成由代理线下拿订单找运营方核算，系统不计算提成。客户端全程不见金额。')}`;
+ if(p==='orders')return `<div class="row between" style="margin-bottom:9px"><div class="muted">勾选订单可组建账期（已选 <b class="gold" id="selCount">${S.selected.size}</b> 单）</div><button class="btn mini gold" data-act="create-settle">组建账期</button></div>${mine.map(o=>orderCard(o,true,true)).join('')}${note_('账期不固定月 / 周，代理可勾任意 N 单（含 1 单）提交运营方；只有「未出账」且未取消的订单能组账期。')}`;
+ if(p==='settle'){const ss=S.settlements.filter(x=>x.agent==='A01');return `<div class="sec">我的结算单 <small>${ss.length} 张</small></div>${ss.map(s=>`<div class="item"><div class="row between"><span class="ttl">${s.no}</span><span class="tag ${s.status==='已结算'?'b':'a'}">${s.status}</span></div><div class="sub">${s.date} · 含 ${s.orders.length} 单 · ${s.orders.join('、')}</div><div class="row between" style="margin-top:7px"><span class="muted">结算金额</span><b class="gold">${money(s.amount)}</b></div><button class="btn mini ghost" style="margin-top:8px" data-act="settle-detail" data-no="${s.no}">查看明细</button></div>`).join('')}${note_('结算＝线下打款 + 线上标记；结算单金额＝所含订单金额合计，**不是提成金额**。提成由代理线下拿订单找运营方算，系统不计算。运营方确认后，结算单与订单标识一起变成「已结算」。')}`}
+ if(p==='customers'){const cs=[...new Map(mine.map(o=>[o.tel,o])).values()];return `<div class="sec">我带来的客户 <small>${cs.length} 位</small></div>${cs.map(o=>`<div class="item"><div class="row between"><span class="ttl">${o.who}</span><span class="tag">${mine.filter(x=>x.tel===o.tel).length} 单</span></div><div class="sub">${o.tel}<br>最近备注：${esc(o.note)}</div></div>`).join('')}${note_('不强制授权才能浏览；进店即留访客记录，下单时引导填电话。')}`}
+ return `<div class="card" style="text-align:center"><div style="font-size:13px;font-weight:700">我的专属推广码</div><div class="muted" style="margin-top:4px">带参小程序码，客户扫码进来即绑定我</div><div class="qr">${qr(1024)}</div><span class="tag">代理编号 A01 · 李宏伟</span><button class="btn ghost" data-act="copy" style="margin-top:11px">复制分享链接</button></div><div class="sec">新订单提醒</div><div class="card"><div class="row between"><span style="font-size:12px">登录后台查看「待确认」订单</span><span class="tag b">无自动推送</span></div><div class="muted" style="margin-top:6px">按没有认证服务号处理：不发公众号模板消息，代理主动登录后台看新订单，与运营方线下微信 / 电话沟通。</div></div>${note_('一次性订阅消息不依赖认证服务号，但需用户一次授权、一次授权发一条，留作二期可选增强。')}`;
+}
+function renderAdmin(){
+ const p=S.page,all=S.orders;
+ if(p==='overview'){const pend=all.filter(o=>o.status==='已提交').length,wait=S.settlements.filter(s=>s.status==='待结算').length,total=all.filter(o=>o.status!=='已取消').reduce((s,o)=>s+amt(o),0);return `<div class="stat"><div><b>${all.length}</b><span>全部订单</span></div><div><b>${pend}</b><span>待确认</span></div><div><b>${wait}</b><span>待审结算</span></div></div><div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:8px">全部销售额（后台口径）</div><div class="row between"><span class="muted">不含已取消订单</span><b class="gold" style="font-size:17px">${money(total)}</b></div></div><div class="sec">待办</div><div class="grid2"><button class="btn ghost" data-act="nav" data-page="orders">处理新订单 ${pend}</button><button class="btn ghost" data-act="nav" data-page="settle">审核结算单 ${wait}</button></div>${note_('运营方＝管理员；自己直接卖货时给自己开一个「运营方自营」代理即可，不另设模糊权限。')}`}
+ if(p==='orders'){const opts=['全部',...S.agents.map(a=>a.id)];const list=all.filter(o=>S.filterAgent==='全部'||o.agent===S.filterAgent);return `<div class="row" style="gap:8px;margin-bottom:10px"><select class="f" data-field="filterAgent" style="flex:1">${opts.map(x=>`<option ${S.filterAgent===x?'selected':''}>${x}</option>`).join('')}</select><button class="btn mini ghost" data-act="export">导出</button></div>${list.map(o=>`<div class="item"><div data-act="order" data-no="${o.no}"><div class="row between"><span class="ttl">${o.who} <span style="font-size:10px;color:#9a92ac">${o.tel}</span></span>${stTag(o.status)}</div><div class="sub">${o.no} · ${o.date} · 代理 ${o.agent} · ${seTag(o.settle)}</div><div class="sub">${o.items.map(i=>i.name+'×'+i.qty).join('、')}　备注：${esc(o.note)}</div><div class="row between" style="margin-top:6px"><span class="muted">订单金额（后台可见）</span><b class="gold">${money(amt(o))}</b></div></div>${o.status==='已提交'?`<button class="btn mini" style="margin-top:8px" data-act="confirm-order" data-no="${o.no}">确定 · 开始备货</button>`:''}</div>`).join('')}${note_('点「确定」后订单变「已确认」，客户在「我的订单」自行查看状态；按无资质不发自动推送（演示只改状态）。')}`}
+ if(p==='settle')return `<div class="sec">结算审核 <small>${S.settlements.filter(s=>s.status==='待结算').length} 张待审</small></div>${S.settlements.map(s=>`<div class="item"><div class="row between"><span class="ttl">${s.no}</span><span class="tag ${s.status==='已结算'?'b':'a'}">${s.status}</span></div><div class="sub">代理 ${s.agent} · ${s.date} · 含 ${s.orders.length} 单：${s.orders.join('、')}</div><div class="row between" style="margin-top:7px"><span class="muted">结算金额</span><b class="gold">${money(s.amount)}</b></div><div class="row" style="margin-top:8px;gap:7px"><button class="btn mini ghost" data-act="settle-detail" data-no="${s.no}">明细</button>${s.status==='待结算'?`<button class="btn mini gold" data-act="confirm-settle" data-no="${s.no}">确认结算</button>`:''}</div></div>`).join('')}${note_('结算＝线下打款 + 线上标记；确认后结算单与所包含订单的结算标识一起变为「已结算」。')}`;
+ if(p==='products')return `<div class="row between" style="margin-bottom:9px"><div class="muted">共 ${S.products.length} 个（正式版 75 个）</div><span class="tag">价格仅后台可见</span></div>${S.products.map(x=>`<div class="item"><div class="row"><div style="width:40px;height:40px;border-radius:8px;background:${x.bg};display:flex;align-items:center;justify-content:center;font-size:19px">${x.emoji}</div><div style="flex:1;margin-left:9px"><div class="ttl">${x.name}</div><div class="sub">编号 ${x.code} · ${x.spec}</div><div class="sub">库存 单品 ${x.stk[0]} / 单组 ${x.stk[1]} / 单件 ${x.stk[2]}</div></div></div><div class="row" style="margin-top:8px;gap:7px"><span class="muted" style="flex:1">后台售价</span><input class="f" style="width:80px;padding:6px 8px" type="number" data-field="price" data-id="${x.id}" value="${x.price}"><button class="btn mini ${x.on?'ghost':''}" data-act="toggle-product" data-id="${x.id}">${x.on?'已上架':'已下架'}</button></div></div>`).join('')}${note_('字段全非必填，不填 / 不加图也能上架；规格库存不填就不在客户端显示。价格改动不影响历史订单的价格快照。')}`;
+ const tabs=[['agents','代理管理'],['packages','套餐'],['config','首页配置'],['notify','通知记录'],['visits','访客']];
+ let body='';
+ if(S.adminTab==='agents')body=S.agents.map(a=>{const os=all.filter(o=>o.agent===a.id&&o.status!=='已取消');return `<div class="item"><div class="row between"><span class="ttl">${esc(a.name)} <span class="tag">${a.id}</span></span><span class="tag ${a.on?'b':'d'}">${a.on?'启用':'停用'}</span></div><div class="sub">${a.tel} · ${os.length} 单 · 销售额 ${money(os.reduce((s,o)=>s+amt(o),0))} · ${a.wx}</div><div class="row" style="margin-top:8px;gap:7px"><button class="btn mini ghost" data-act="agent-orders" data-id="${a.id}">看他的订单</button><button class="btn mini ghost" data-act="toggle-agent" data-id="${a.id}">${a.on?'停用':'启用'}</button></div></div>`}).join('')+`<button class="btn" data-act="add-agent">＋ 添加代理</button>`;
+ if(S.adminTab==='packages')body=S.packages.map(k=>`<div class="card row"><span style="font-size:25px">${k.emoji}</span><div style="flex:1;margin-left:10px"><div style="font-size:13px;font-weight:700">${k.name}</div><div class="muted" style="margin-top:3px">${k.desc}</div><div class="gold" style="margin-top:5px">后台价 ${money(k.price)}</div></div></div>`).join('');
+ if(S.adminTab==='config')body=`<div class="card"><label class="f">首页宣传语（改完客户端首页立刻变）</label><input class="f" data-field="slogan" value="${esc(S.slogan)}"><label class="f">名头图 / 宣传图</label><div class="card flat" style="margin:0;text-align:center"><span style="font-size:30px">🏮</span><div class="muted">图片上传位置（演示占位）</div></div><label class="f">加好友二维码</label><div class="qr">${qr(7788)}</div></div>`;
+ if(S.adminTab==='notify')body=`<div class="sec">通知记录</div>${S.notify.map(n=>`<div class="item"><div class="row between"><span class="ttl">${n.e}</span><span class="tag">${n.t}</span></div><div class="sub">接收：${n.to}<br>通道：${n.c}</div></div>`).join('')}`+note_('按无资质：不做公众号模板消息，通知只作后台站内留痕；客户自动通知留作二期可选。');
+ if(S.adminTab==='visits')body=`<div class="sec">访客记录 <small>不拦浏览</small></div>${S.orders.slice(0,6).map(o=>`<div class="item"><div class="row between"><span class="ttl">${o.who}</span><span class="tag">${o.agent}</span></div><div class="sub">${o.date} · 来源：${o.agent==='A00'?'自然流量':'代理分享码'}</div></div>`).join('')}`+note_('不强制授权才能浏览；定位第一版不做。');
+ return `<div class="stabs">${tabs.map(t=>`<div class="stab ${S.adminTab===t[0]?'on':''}" data-act="admin-tab" data-tab="${t[0]}">${t[1]}</div>`).join('')}</div>${body}`;
+}
+function renderModal(){
+ const host=document.getElementById('modalHost'),m=S.modal;
+ if(!m){host.innerHTML='';return}
+ let b='';
+ if(m.type==='product'){const x=S.products.find(p=>p.id===m.id);b=`<h3>${x.name}<span class="close" data-act="close">关闭</span></h3>${thumb(x)}<div class="muted" style="margin:9px 0">编号 ${x.code} · ${x.spec}</div><div class="card" data-act="video"><div class="row between"><span style="font-size:12px">▶ 烟花效果视频</span><span>🎥</span></div></div><div class="card"><div style="font-size:12px;font-weight:700;margin-bottom:7px">选择规格（三层库存独立）</div>${['单品','单组','单件'].map((s,i)=>`<div class="row between" style="margin-bottom:6px"><span style="font-size:11px">${s}　<span class="muted">库存 ${x.stk[i]}</span></span><button class="btn mini ${x.stk[i]===0?'ghost':''}" data-act="add" data-id="${x.id}" data-spec="${s}" ${x.stk[i]===0?'disabled':''}>加入</button></div>`).join('')}</div>${note_('客户端不显示价格。图片与视频由商户提供，字段可不填也能上架。')}`}
+ if(m.type==='order'){const o=S.orders.find(x=>x.no===m.no);b=`<h3>订单详情<span class="close" data-act="close">关闭</span></h3><div class="item"><div class="row between"><span class="ttl">${o.who}</span>${stTag(o.status)}</div><div class="sub">${o.no}<br>${o.date}<br>${o.tel}<br>代理 ${o.agent} · ${seTag(o.settle)}<br>备注：${esc(o.note)||'无'}</div></div><div class="card">${o.items.map(i=>`<div class="row between" style="margin-bottom:6px"><span style="font-size:12px">${i.name}（${i.spec}）× ${i.qty}</span>${S.role==='customer'?'':`<span class="muted">${money(i.price*i.qty)}</span>`}</div>`).join('')}${S.role==='customer'?'':`<div class="row between" style="border-top:1px solid #3a3150;padding-top:8px"><b style="font-size:12px">合计（后台）</b><b class="gold">${money(amt(o))}</b></div>`}</div><div class="sec" style="margin:10px 0 6px">状态流转</div><div class="timeline"><div>${o.date}　订单已提交</div>${o.status!=='已提交'?`<div>运营方已确定，开始备货</div>`:''}${o.status==='已完成'?`<div>订单已完成</div>`:''}${o.status==='已取消'?`<div>订单已取消</div>`:''}</div>${note_('只登记订单，不支付、不结算。')}`}
+ if(m.type==='video')b=`<h3>烟花效果视频<span class="close" data-act="close">关闭</span></h3><div class="card" style="text-align:center;padding:32px 14px"><div style="font-size:44px">🎆</div><div class="muted" style="margin-top:9px">演示占位：正式版播放商户提供的实拍视频，文件放云存储</div></div><button class="btn ghost" data-act="close">知道了</button>`;
+ if(m.type==='addAgent')b=`<h3>添加代理<span class="close" data-act="close">关闭</span></h3><div class="card"><label class="f">姓名</label><input class="f" data-field="newName" placeholder="代理姓名"><label class="f">电话</label><input class="f" data-field="newTel" placeholder="手机号"></div><button class="btn" data-act="save-agent">保存</button>`;
+ if(m.type==='agentOrders'){const a=S.agents.find(x=>x.id===m.id),list=S.orders.filter(o=>o.agent===m.id);b=`<h3>${esc(a.name)} 的订单<span class="close" data-act="close">关闭</span></h3>${list.map(o=>orderCard(o,true,false)).join('')||'<div class="empty">暂无订单</div>'}<button class="btn ghost" data-act="close">返回</button>`}
+ if(m.type==='settleDetail'){const s=S.settlements.find(x=>x.no===m.no);b=`<h3>结算单 ${s.no}<span class="close" data-act="close">关闭</span></h3><div class="item"><div class="row between"><span class="ttl">代理 ${s.agent}</span><span class="tag ${s.status==='已结算'?'b':'a'}">${s.status}</span></div><div class="sub">${s.date} · 含 ${s.orders.length} 单</div></div>${s.orders.map(n=>{const o=S.orders.find(x=>x.no===n);return o?`<div class="row between" style="font-size:11px;margin-bottom:7px"><span class="muted">${n}　${o.who}</span><span>${money(amt(o))}</span></div>`:''}).join('')}<div class="card"><div class="row between"><b style="font-size:12px">结算金额</b><b class="gold">${money(s.amount)}</b></div></div><button class="btn ghost" data-act="close">返回</button>`}
+ if(m.type==='bind')b=`<h3>新订单提醒<span class="close" data-act="close">关闭</span></h3><div class="card"><div class="muted">按没有认证服务号处理：不做公众号绑定与模板消息推送。代理 / 运营方登录后台查看「待确认」订单，客户提交后自行查看状态，双方线下微信 / 电话沟通。</div></div><button class="btn ghost" data-act="close">知道了</button>`;
+ host.innerHTML=`<div class="mbg" data-act="close-bg"><div class="modal">${b}</div></div>`;
+}
+function render(){
+ const r=S.role,c=TABS[r];
+ document.getElementById('rTitle').textContent=ROLE[r][0];
+ document.getElementById('rSub').textContent=ROLE[r][1];
+ document.querySelectorAll('.roles button').forEach(b=>b.classList.toggle('on',b.dataset.role===r));
+ document.getElementById('tabbar').innerHTML=c.map(t=>`<button data-act="nav" data-page="${t.k}" class="${S.page===t.k||(r==='customer'&&S.page==='checkout'&&t.k==='cart')?'on':''}"><span>${t.i}</span>${t.n}</button>`).join('');
+ const key=r+'/'+S.page,keep=S._key===key,s=document.getElementById('screen'),y=s.scrollTop;
+ s.innerHTML=({customer:renderCustomer,agent:renderAgent,admin:renderAdmin})[r]();
+ s.scrollTop=keep?y:0;S._key=key;renderModal();
+}
+function openCheckout(){S.form.who=S.profile.who;S.form.tel=S.profile.tel;S.form.note='';S.page='checkout';render()}
+document.addEventListener('click',e=>{
+ const el=e.target.closest('[data-act]');if(!el)return;
+ const a=el.dataset.act,id=el.dataset.id,no=el.dataset.no;
+ if(a==='close-bg'&&e.target!==el)return;
+ if(a==='role'){S.role=el.dataset.role;S.page=TABS[S.role][0].k;S.modal=null;S.selected.clear();render();return}
+ if(a==='nav'){S.page=el.dataset.page;S.modal=null;render();return}
+ if(a==='cat'){S.cat=el.dataset.cat;S.page=S.role==='customer'?'goods':S.page;render();return}
+ if(a==='product'){S.modal={type:'product',id};renderModal();return}
+ if(a==='order'){S.modal={type:'order',no};renderModal();return}
+ if(a==='video'){S.modal={type:'video'};renderModal();return}
+ if(a==='close'||a==='close-bg'){S.modal=null;renderModal();return}
+ if(a==='add'){const spec=el.dataset.spec||'单件',c=S.cart.find(x=>x.id===id&&x.spec===spec);if(c)c.qty++;else S.cart.push({id,spec,qty:1});S.modal=null;render();toast('已加入购物车（'+spec+'）');return}
+ if(a==='qty'){const c=S.cart.find(x=>x.id===id&&x.spec===el.dataset.spec);if(!c)return;c.qty+=Number(el.dataset.d);if(c.qty<=0)S.cart=S.cart.filter(x=>x!==c);render();return}
+ if(a==='sub'){S.form.sub=S.form.sub?0:1;render();return}
+ if(a==='submit'){
+  if(!S.cart.length){toast('购物车是空的');return}
+  if(!S.form.who||!S.form.tel){toast('请填姓名和电话');return}
+  const no='NO'+Date.now();
+  const items=S.cart.map(c=>{const x=S.products.find(y=>y.id===c.id);return{name:x.name,spec:c.spec,qty:c.qty,price:x.price}});
+  S.orders.unshift({no,agent:'A01',who:S.form.who,tel:S.form.tel,note:S.form.note||'（未填）',status:'已提交',settle:'未出账',date:'2026-11-12 刚刚',mine:1,items});
+  S.profile.who=S.form.who;S.profile.tel=S.form.tel;S.cart=[];S.page='orders';render();
+  pushNotify('新订单提交','代理 李宏伟 + 运营方','后台站内留痕');return
+ }
+ if(a==='select'){const o=S.orders.find(x=>x.no===no);if(o.settle!=='未出账'||o.status==='已取消'){toast('该订单不能组账期');return}if(S.selected.has(no))S.selected.delete(no);else S.selected.add(no);render();return}
+ if(a==='create-settle'){
+  const list=[...S.selected];if(!list.length){toast('请先勾选订单');return}
+  const sd='S'+Date.now(),amount=list.reduce((s,n)=>s+amt(S.orders.find(o=>o.no===n)),0);
+  S.settlements.unshift({no:sd,agent:'A01',orders:list,amount,status:'待结算',date:'2026-11-12'});
+  list.forEach(n=>S.orders.find(o=>o.no===n).settle='已出账');S.selected.clear();S.page='settle';render();
+  pushNotify('结算单提交','运营方','后台站内留痕');return
+ }
+ if(a==='settle-detail'){S.modal={type:'settleDetail',no};renderModal();return}
+ if(a==='confirm-settle'){const s=S.settlements.find(x=>x.no===no);s.status='已结算';s.orders.forEach(n=>S.orders.find(o=>o.no===n).settle='已结算');S.modal=null;render();pushNotify('结算单确认','代理 李宏伟','后台站内留痕');return}
+ if(a==='confirm-order'){const o=S.orders.find(x=>x.no===no);o.status='已确认';render();pushNotify('订单确认备货','客户 '+o.who,'二期可选：订阅消息');return}
+ if(a==='copy'){toast('分享链接已复制（演示）');return}
+ if(a==='export'){toast('导出功能演示占位');return}
+ if(a==='bind'){S.modal={type:'bind'};renderModal();return}
+ if(a==='admin-tab'){S.adminTab=el.dataset.tab;render();return}
+ if(a==='add-agent'){S.modal={type:'addAgent'};renderModal();return}
+ if(a==='save-agent'){const n=S._newName||'';if(!n){toast('请填姓名');return}const nid='A'+String(S.agents.length).padStart(2,'0');S.agents.push({id:nid,name:n,tel:S._newTel||'未填',on:1,wx:'未绑定'});S._newName='';S._newTel='';S.modal=null;render();toast('已添加代理 '+nid);return}
+ if(a==='toggle-agent'){const x=S.agents.find(y=>y.id===id);x.on=x.on?0:1;render();return}
+ if(a==='agent-orders'){S.modal={type:'agentOrders',id};renderModal();return}
+ if(a==='toggle-product'){const x=S.products.find(y=>y.id===id);x.on=x.on?0:1;render();return}
+});
+document.addEventListener('input',e=>{
+ const f=e.target.dataset.field;if(!f)return;
+ if(f==='who'||f==='tel'||f==='note'){S.form[f]=e.target.value;return}
+ if(f==='slogan'){S.slogan=e.target.value;return}
+ if(f==='price'){const x=S.products.find(y=>y.id===e.target.dataset.id);if(x)x.price=Number(e.target.value)||0;return}
+ if(f==='filterAgent'){S.filterAgent=e.target.value;render();return}
+ if(f==='newName'){S._newName=e.target.value;return}
+ if(f==='newTel'){S._newTel=e.target.value;return}
+});
+S.form.who=S.profile.who;S.form.tel=S.profile.tel;render();
+</script>
+</body>
+</html>

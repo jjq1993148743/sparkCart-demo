@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>长春烟花鞭炮选品库 · 线上产品画册 2.0</title>
+<!--
+  SparkCart 演示原型 2.0（基于 1.0 demo/index.html 重做）
+  2.0：深靛夜空 + 香槟金配色；仅「客户端 / 商户后台」两套页面；
+       移除分销角色及其配套功能与字段。
+  1.0：demo/index.html 原样保留，未修改。
+-->
+<style>
+:root{
+  --night:#080E1B;--panel:#111C30;--panel2:#16243C;
+  --line:rgba(216,176,113,.16);--line2:rgba(216,176,113,.36);
+  --gold:#D8B071;--gold-l:#F2DFB4;--gold-d:#9A7840;
+  --ember:#E2764B;--silver:#93A6C0;--ink:#F4F0E6;--mute:#7C8CA6;
+  --serif:"Songti SC","STSong","Noto Serif CJK SC","Source Han Serif SC",SimSun,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  --num:Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);color:var(--ink);min-height:100vh;padding:34px 14px 44px;
+  background:radial-gradient(1100px 620px at 50% -12%,rgba(45,68,112,.45),transparent 62%),
+             radial-gradient(520px 420px at 6% 76%,rgba(226,118,75,.07),transparent 70%),
+             linear-gradient(180deg,var(--night),#050910 72%)}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.45;
+  background-image:radial-gradient(rgba(242,223,180,.10) .6px,transparent .6px);background-size:23px 23px}
+.stage{max-width:420px;margin:0 auto;position:relative}
+.brand{display:flex;align-items:flex-end;justify-content:space-between;padding:0 4px 15px;border-bottom:1px solid var(--line)}
+.brand .cn{font-family:var(--serif);font-size:23px;letter-spacing:5px;line-height:1.15;font-weight:400}
+.brand .en{font-family:var(--num);font-size:9px;letter-spacing:3px;color:var(--gold-d);margin-top:7px;text-transform:uppercase}
+.edition{font-family:var(--num);font-size:10px;letter-spacing:1.6px;color:var(--gold);border:1px solid var(--line2);border-radius:3px;padding:5px 9px}
+.switch{display:flex;gap:30px;justify-content:center;margin:19px 0 14px}
+.switch button{position:relative;border:0;background:none;color:var(--mute);font-family:var(--serif);font-size:12px;letter-spacing:2.5px;padding:0 2px 10px;cursor:pointer}
+.switch button.on{color:var(--gold-l)}
+.switch button.on:after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:24px;height:1px;background:var(--gold)}
+.switch button:focus-visible,.btn:focus-visible,.tabbar button:focus-visible,.chip:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+.guide{font-size:10px;line-height:1.85;color:var(--mute);border-left:1px solid var(--line2);padding:1px 0 1px 11px;margin-bottom:16px;text-align:left}
+.guide b{color:var(--gold);font-weight:400}
+.phone{width:390px;max-width:100%;height:772px;margin:0 auto;padding:8px;border:1px solid rgba(216,176,113,.3);border-radius:42px;
+  background:#0A1222;box-shadow:0 32px 84px rgba(0,0,0,.66),0 0 0 6px rgba(255,255,255,.014),inset 0 1px 0 rgba(255,255,255,.07);
+  display:flex;flex-direction:column;overflow:hidden}
+.frame{flex:1;min-height:0;position:relative;border-radius:35px;overflow:hidden;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,#0C1526,#070D19)}
+.status{height:29px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 19px;font-family:var(--num);font-size:10px;color:var(--silver);letter-spacing:.6px}
+.status .dots{display:flex;gap:3px;align-items:center}
+.status .dots i{width:3px;height:3px;border-radius:50%;background:var(--gold);display:block}
+.navbar{height:51px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line)}
+.navbar .nt{font-family:var(--serif);font-size:15px;letter-spacing:2.5px}
+.navbar .ns{font-family:var(--num);font-size:9px;letter-spacing:1.7px;color:var(--gold-d);margin-top:4px}
+.seal{width:31px;height:31px;border:1px solid var(--line2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--num);font-size:9px;color:var(--gold);letter-spacing:.4px}
+.screen{flex:1;min-height:0;overflow-y:auto;padding:15px 16px 26px;scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+.screen::-webkit-scrollbar{width:3px}
+.screen::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+.tabbar{height:59px;flex-shrink:0;border-top:1px solid var(--line);display:flex;background:rgba(7,13,25,.94)}
+.tabbar button{flex:1;border:0;background:none;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:9px;letter-spacing:1px;cursor:pointer;position:relative}
+.tabbar button.on{color:var(--gold-l)}
+.tabbar button.on:before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:20px;height:1px;background:var(--gold)}
+.tabbar svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.homebar{height:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(7,13,25,.94)}
+.homebar i{width:88px;height:3px;border-radius:3px;background:rgba(242,223,180,.32)}
+.hero{position:relative;border:1px solid var(--line);border-radius:13px;overflow:hidden;padding:22px 18px 21px;margin-bottom:17px;
+  background:radial-gradient(230px 190px at 80% 18%,rgba(216,176,113,.17),transparent 72%),linear-gradient(155deg,#14223C,#0A1222 72%)}
+.hero .burst{position:absolute;right:-46px;top:-48px;width:192px;height:192px;animation:bloom 1.5s cubic-bezier(.2,.8,.2,1) both}
+.hero .burst svg{width:100%;height:100%}
+.hero .eyebrow{font-family:var(--num);font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+.hero h2{font-family:var(--serif);font-weight:400;font-size:25px;line-height:1.55;letter-spacing:3px;color:var(--gold-l);margin-top:13px}
+.hero p{font-size:10px;color:var(--silver);letter-spacing:1.3px;line-height:1.9;margin-top:9px}
+.hero .rule{width:36px;height:1px;background:var(--gold);margin-top:15px}
+@keyframes bloom{from{opacity:0;transform:scale(.55) rotate(-22deg)}to{opacity:.9;transform:scale(1) rotate(0)}}
+@media(prefers-reduced-motion:reduce){.hero .burst{animation:none}.modal{animation:none}.card.hover{transition:none}}
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:19px 0 11px}
+.sec h3{font-family:var(--serif);font-size:15px;font-weight:400;letter-spacing:2.5px}
+.sec h3:before{content:"";display:inline-block;width:3px;height:12px;background:var(--gold);margin-right:9px;vertical-align:-1px}
+.sec small{font-size:10px;color:var(--mute);letter-spacing:.6px;cursor:pointer}
+.sec small.hit{color:var(--gold)}
+.card{background:linear-gradient(160deg,rgba(22,36,60,.86),rgba(11,20,36,.92));border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:11px}
+.card.flat{padding:10px}
+.card.hover{transition:transform .22s ease,border-color .22s ease;cursor:pointer}
+.card.hover:hover{transform:translateY(-2px);border-color:var(--line2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.thumb{height:102px;border-radius:9px;position:relative;overflow:hidden;
+  background:radial-gradient(circle at 50% 46%,var(--glow),transparent 68%),linear-gradient(160deg,#13223C,#0A1222)}
+.thumb svg{position:absolute;inset:0;width:100%;height:100%}
+.thumb .code{position:absolute;left:7px;bottom:7px;font-family:var(--num);font-size:9px;letter-spacing:1.3px;color:var(--gold-l);background:rgba(5,10,20,.66);border:1px solid var(--line);padding:2px 7px;border-radius:3px}
+.pname{font-family:var(--serif);font-size:12.5px;letter-spacing:.6px;line-height:1.45;margin:9px 0 4px}
+.pcode{font-family:var(--num);font-size:9.5px;color:var(--mute);letter-spacing:.7px}
+.muted{color:var(--mute);font-size:10.5px;line-height:1.8}
+.gold{color:var(--gold)}
+.tag{font-size:9px;padding:3px 8px;border:1px solid var(--line2);border-radius:3px;color:var(--gold);letter-spacing:.6px;white-space:nowrap}
+.tag.s1{color:#E9C98F;border-color:rgba(233,201,143,.42)}
+.tag.s2{color:#9FD6BE;border-color:rgba(159,214,190,.35)}
+.tag.s3{color:#9FB6D6;border-color:rgba(159,182,214,.35)}
+.tag.s4{color:#D69A9A;border-color:rgba(214,154,154,.35)}
+.btn{display:block;width:100%;border:1px solid var(--gold-d);border-radius:8px;padding:11px;cursor:pointer;
+  background:linear-gradient(135deg,#E7C692,#B68A4B);color:#10151F;font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:2px}
+.btn.ghost{background:transparent;color:var(--gold-l);border-color:var(--line2)}
+.btn.mini{display:inline-block;width:auto;padding:6px 12px;font-size:10px;letter-spacing:.8px;border-radius:6px}
+.btn:active{transform:scale(.985)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;align-items:center;gap:9px}
+.row.between{justify-content:space-between}
+.chips{display:flex;gap:7px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;font-size:10.5px;letter-spacing:1px;padding:6px 13px;border-radius:3px;border:1px solid var(--line);color:var(--mute);background:rgba(9,16,30,.6);cursor:pointer}
+.chip.on{border-color:var(--gold-d);color:var(--gold-l);background:rgba(216,176,113,.1)}
+.item{background:linear-gradient(160deg,rgba(22,36,60,.7),rgba(11,20,36,.8));border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:9px}
+.item .ttl{font-family:var(--serif);font-size:12.5px;letter-spacing:.8px;margin-bottom:5px}
+.item .sub{font-size:10px;color:var(--mute);line-height:1.75}
+.qty{display:flex;align-items:center;gap:7px}
+.qty button{width:22px;height:22px;border:1px solid var(--line2);border-radius:5px;background:rgba(216,176,113,.08);color:var(--gold-l);font-size:13px;cursor:pointer;line-height:1}
+.qty span{font-family:var(--num);font-size:12px;min-width:15px;text-align:center}
+label.f{display:block;font-size:10px;color:var(--silver);letter-spacing:1px;margin:12px 0 6px}
+input.f,textarea.f,select.f{width:100%;background:rgba(5,11,22,.7);border:1px solid var(--line);border-radius:7px;padding:10px 11px;color:var(--ink);font-family:var(--sans);font-size:12px;outline:none}
+textarea.f{resize:none;height:66px}
+input.f:focus,textarea.f:focus,select.f:focus{border-color:var(--gold)}
+.notice{font-size:10px;line-height:1.85;color:var(--mute);border-left:1px solid var(--gold-d);padding:2px 0 2px 10px;margin-top:12px}
+.pill{display:inline-block;font-size:9px;padding:2px 7px;border:1px solid var(--line);border-radius:3px;color:var(--silver);margin-left:5px}
+.stat{display:flex;gap:9px;margin-bottom:12px}
+.stat>div{flex:1;border:1px solid var(--line);border-radius:9px;padding:12px 4px;text-align:center;background:rgba(9,16,30,.5)}
+.stat b{display:block;font-family:var(--num);font-size:19px;font-weight:400;color:var(--gold-l);margin-bottom:5px}
+.stat span{font-size:9.5px;color:var(--mute);letter-spacing:.6px}
+.stabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+.stabs::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;font-size:10px;letter-spacing:1px;padding:6px 11px;border:1px solid var(--line);border-radius:4px;color:var(--mute);cursor:pointer}
+.stab.on{color:var(--gold-l);border-color:var(--gold-d);background:rgba(216,176,113,.1)}
+.qr{width:120px;height:120px;background:#F4F0E6;border-radius:8px;padding:8px;margin:12px auto}
+.qr svg{width:100%;height:100%;fill:#0A1222}
+.timeline{border-left:1px solid var(--line2);margin:8px 0 0 5px;padding-left:13px}
+.timeline div{font-size:10px;color:var(--silver);margin-bottom:9px;position:relative;line-height:1.6}
+.timeline div:before{content:"";position:absolute;left:-17px;top:5px;width:6px;height:6px;border:1px solid var(--gold);border-radius:50%;background:#0A1222}
+.empty{text-align:center;color:var(--mute);font-size:11px;letter-spacing:1px;padding:36px 0}
+.vplay{width:36px;height:36px;flex-shrink:0;border:1px solid var(--gold-d);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.vplay svg{width:16px;height:16px;fill:currentColor;stroke:none}
+.vtitle{font-family:var(--serif);font-size:13px;letter-spacing:1.4px}
+.vburst{width:44px;height:44px;flex-shrink:0;opacity:.85}
+.vburst svg{width:100%;height:100%}
+.mbg{position:absolute;inset:0;background:rgba(3,7,15,.82);display:flex;align-items:flex-end;z-index:20;backdrop-filter:blur(3px)}
+.modal{width:100%;max-height:83%;overflow-y:auto;background:linear-gradient(180deg,#16243C,#0B1424);border-top:1px solid var(--line2);border-radius:18px 18px 0 0;padding:18px 17px 28px;animation:rise .28s ease both}
+@keyframes rise{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h3{font-family:var(--serif);font-size:16px;font-weight:400;letter-spacing:2px;margin-bottom:13px}
+.close{float:right;font-size:10px;color:var(--silver);letter-spacing:1px;cursor:pointer;padding:4px 0 4px 10px}
+.toast{position:absolute;left:50%;bottom:86px;transform:translateX(-50%) translateY(6px);background:rgba(5,11,22,.96);border:1px solid var(--line2);color:var(--gold-l);font-size:10.5px;letter-spacing:.8px;padding:9px 16px;border-radius:20px;z-index:30;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{margin-top:18px;text-align:center;font-size:9.5px;color:#5C6B84;line-height:1.95;letter-spacing:.5px}
+.foot em{color:var(--gold-d);font-style:normal}
+.pick{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:8px;padding:8px 9px;margin-bottom:7px;cursor:pointer;background:rgba(9,16,30,.5)}
+.pick.on{border-color:var(--gold-d);background:rgba(216,176,113,.1)}
+.pick .box{width:16px;height:16px;flex-shrink:0;border:1px solid var(--line2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#10151F}
+.pick.on .box{background:var(--gold);border-color:var(--gold)}
+.pick .mini-thumb{width:28px;height:28px;flex-shrink:0;border-radius:5px;overflow:hidden;position:relative}
+.pick .mini-thumb svg{width:100%;height:100%}
+.pick .pn{font-size:11px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pick .pc{font-family:var(--num);font-size:9px;color:var(--mute);flex-shrink:0}
+@media(max-width:430px){body{padding:18px 8px 30px}.phone{height:726px;border-radius:32px}.frame{border-radius:26px}.brand .cn{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="brand">
+    <div><div class="cn">长春烟花鞭炮选品库</div><div class="en">Changchun Fireworks · 2026</div></div>
+    <div class="edition">V 2.0</div>
+  </div>
+  <div class="switch">
+    <button data-act="role" data-role="customer" class="on">客户端</button>
+    <button data-act="role" data-role="merchant">商户后台</button>
+  </div>
+  <div class="guide"><b>演示主线</b>　先看客户端产品画册，再走留资闭环：选品 → 加入选品单 → 提交订单 → 商户后台「确定备货」→ 客户查看订单状态。<br>本版本只有两套页面（客户端 / 商户后台）；不线上收款、不显示金额给客户。</div>
+  <div class="phone">
+    <div class="frame">
+      <div class="status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+      <div class="navbar">
+        <div><div class="nt" id="rTitle">产品画册</div><div class="ns" id="rSub">CHANGCHUN · SELECTION</div></div>
+        <div class="seal">CC</div>
+      </div>
+      <div class="screen" id="screen"></div>
+      <div class="tabbar" id="tabbar"></div>
+      <div class="homebar"><i></i></div>
+      <div class="toast" id="toast"></div>
+      <div id="modalHost"></div>
+    </div>
+  </div>
+  <div class="foot">线上产品画册 · 单文件离线可开 · 测试数据刷新即重置<br><em>按无烟花类目资质与无认证服务号处理</em>：不线上收款、不做自动推送 · 客户端全程不出现金额</div>
+</div>
+<script>
+const P=[
+ {id:'P115',code:'115',name:'20发笛音发财雷',spec:'6/1 · 24盒/箱',cat:'雷类',price:115,stk:[86,42,18],hue:18},
+ {id:'P400',code:'400',name:'16发欢乐雷王',spec:'80/1 · 12盒/箱',cat:'雷类',price:400,stk:[42,20,9],hue:38},
+ {id:'P300',code:'300',name:'168发轰天雷',spec:'4/1 · 8盒/箱',cat:'组合',price:300,stk:[18,8,0],hue:280},
+ {id:'P192',code:'192',name:'88发闪光雷',spec:'8/1 · 16盒/箱',cat:'组合',price:192,stk:[64,30,12],hue:200},
+ {id:'P200',code:'200',name:'48发闪光雷',spec:'8/1 · 16盒/箱',cat:'组合',price:200,stk:[0,16,8],hue:158},
+ {id:'P220',code:'220',name:'36发闪光雷',spec:'18/1 · 10盒/箱',cat:'组合',price:220,stk:[31,14,6],hue:320},
+ {id:'P120',code:'120',name:'小黄人儿童烟花',spec:'24盒/箱',cat:'儿童',price:120,stk:[120,60,30],hue:48},
+ {id:'P140',code:'140',name:'小汽车儿童烟花',spec:'18盒/箱',cat:'儿童',price:140,stk:[75,36,18],hue:214}
+];
+const PKG=[
+ {id:'K01',name:'开业大吉套餐',desc:'20发笛音发财雷 · 16发欢乐雷王 · 88发闪光雷',price:688,hue:32,on:1,contains:['P115','P400','P192']},
+ {id:'K02',name:'良辰吉日套餐',desc:'168发轰天雷 · 48发闪光雷 · 36发闪光雷',price:699,hue:288,on:1,contains:['P300','P200','P220']},
+ {id:'K03',name:'童趣时光套餐',desc:'小黄人儿童烟花 · 小汽车儿童烟花',price:238,hue:52,on:1,contains:['P120','P140']}
+];
+const ORD=[
+ {no:'NO20261112001',who:'王老板',tel:'13800001111',note:'今晚3点送到南关区××超市',status:'已提交',date:'2026-11-12 09:20',mine:1,items:[{name:'20发笛音发财雷',spec:'单件',qty:1,price:115},{name:'16发欢乐雷王',spec:'单件',qty:1,price:400}]},
+ {no:'NO20261111002',who:'王老板',tel:'13800001111',note:'周末库房自提',status:'已确认',date:'2026-11-11 15:42',mine:1,items:[{name:'88发闪光雷',spec:'单组',qty:2,price:192}]},
+ {no:'NO20261109003',who:'赵经理',tel:'13800003333',note:'婚礼用，已电话确认',status:'已完成',date:'2026-11-09 11:08',items:[{name:'开业大吉套餐',spec:'套餐',qty:1,price:688}]},
+ {no:'NO20261110004',who:'李婶',tel:'13800002222',note:'朝阳区，等电话',status:'已确认',date:'2026-11-10 18:30',items:[{name:'36发闪光雷',spec:'单件',qty:1,price:220}]},
+ {no:'NO20261108005',who:'孙老板',tel:'13800004444',note:'二道区，等报价',status:'已提交',date:'2026-11-08 10:11',items:[{name:'168发轰天雷',spec:'单件',qty:1,price:300}]},
+ {no:'NO20261107006',who:'周姐',tel:'13800005555',note:'自提',status:'已完成',date:'2026-11-07 14:20',items:[{name:'童趣时光套餐',spec:'套餐',qty:1,price:238}]},
+ {no:'NO20261028007',who:'吴总',tel:'13800006666',note:'老客户，周末提货',status:'已完成',date:'2026-10-28 09:05',items:[{name:'良辰吉日套餐',spec:'套餐',qty:1,price:699}]},
+ {no:'NO20261112009',who:'陈老板',tel:'13800008888',note:'经开区，先留个单',status:'已提交',date:'2026-11-12 10:02',items:[{name:'48发闪光雷',spec:'单件',qty:1,price:200}]}
+];
+const TABS={
+ customer:[{k:'home',n:'首页',i:'home'},{k:'goods',n:'选品',i:'grid'},{k:'cart',n:'选品单',i:'bag'},{k:'orders',n:'订单',i:'list'},{k:'my',n:'我的',i:'user'}],
+ merchant:[{k:'overview',n:'概览',i:'chart'},{k:'orders',n:'订单',i:'list'},{k:'products',n:'商品',i:'box'},{k:'manage',n:'管理',i:'sliders'}]
+};
+const ROLE={customer:['产品画册','CHANGCHUN · SELECTION'],merchant:['商户后台','CHANGCHUN · CONSOLE']};
+const ICON={
+ home:'<path d="M2.8 8.4L9 3.2l6.2 5.2v6.1a1 1 0 0 1-1 1h-3.1v-4.7H6.9v4.7H3.8a1 1 0 0 1-1-1z"/>',
+ grid:'<rect x="2.4" y="2.4" width="5.2" height="5.2" rx=".8"/><rect x="10.4" y="2.4" width="5.2" height="5.2" rx=".8"/><rect x="2.4" y="10.4" width="5.2" height="5.2" rx=".8"/><rect x="10.4" y="10.4" width="5.2" height="5.2" rx=".8"/>',
+ bag:'<path d="M3.4 6h11.2l-1 9.6H4.4z"/><path d="M6.4 6V4.6a2.6 2.6 0 0 1 5.2 0V6"/>',
+ list:'<rect x="3" y="2.4" width="12" height="13.2" rx="1.2"/><path d="M6 6.4h6M6 9.4h6M6 12.4h4"/>',
+ user:'<circle cx="9" cy="6" r="2.8"/><path d="M3.4 15.8c.6-3 2.7-4.4 5.6-4.4s5 1.4 5.6 4.4"/>',
+ chart:'<path d="M3 15.6V9M7.5 15.6V3.8M12 15.6v-6.2M16.5 15.6V6"/>',
+ box:'<path d="M2.5 5.8L9 2.8l6.5 3v7L9 15.8l-6.5-3z"/><path d="M2.5 5.8L9 8.8l6.5-3M9 8.8v7"/>',
+ sliders:'<path d="M3 5h12M3 9h12M3 13h12"/><circle cx="6.2" cy="5" r="1.4" fill="#0C1526"/><circle cx="12" cy="9" r="1.4" fill="#0C1526"/><circle cx="8" cy="13" r="1.4" fill="#0C1526"/>'
+};
+const S={role:'customer',page:'home',cat:'全部',filterStatus:'全部',adminTab:'home',cart:[],modal:null,
+ slogan:'一城烟火 · 万象生辉',
+ profile:{who:'王老板',tel:'13800001111'},
+ form:{who:'',tel:'',note:''},
+ products:P.map(x=>({...x,stk:[...x.stk],on:1})),packages:PKG.map(x=>({...x})),
+ orders:ORD.map(x=>({...x,items:x.items.map(i=>({...i}))})),
+ logs:[{t:'09:20',e:'新订单提交',to:'商户后台 · 待确认列表'},{t:'09:21',e:'订单确认备货',to:'客户自行查看订单状态'}],
+ _key:''};
+const amt=o=>o.items.reduce((s,i)=>s+i.price*i.qty,0);
+const money=n=>'¥'+Number(n).toFixed(0);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const icon=k=>`<svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${ICON[k]}</svg>`;
+const stTag=s=>`<span class="tag ${{'已提交':'s1','已确认':'s2','已完成':'s3','已取消':'s4'}[s]||''}">${s}</span>`;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window._t);window._t=setTimeout(()=>t.classList.remove('show'),2100)}
+function logEvent(e,to){S.logs.unshift({t:'刚刚',e,to});toast(e+' · 已记入后台')}
+function burst(seed,hue,n){
+ let s=seed,lines='',dots='';
+ const rnd=()=>{s=(s*9301+49297)%233280;return s/233280};
+ for(let i=0;i<(n||24);i++){
+  const a=Math.PI*2*i/(n||24),len=25+rnd()*17;
+  const x1=50+Math.cos(a)*7,y1=50+Math.sin(a)*7;
+  const x2=50+Math.cos(a)*len,y2=50+Math.sin(a)*len;
+  lines+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="hsl(${hue},64%,74%)" stroke-width=".7" opacity="${(.3+rnd()*.6).toFixed(2)}"/>`;
+  if(rnd()>.42)dots+=`<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="${(.7+rnd()*.9).toFixed(1)}" fill="hsl(${hue},80%,80%)" opacity=".9"/>`;
+ }
+ return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="50" cy="50" r="3.6" fill="hsl(${hue},72%,82%)"/><circle cx="50" cy="50" r="11" fill="none" stroke="hsl(${hue},60%,72%)" stroke-width=".5" opacity=".45"/>${lines}${dots}</svg>`;
+}
+function qr(seed){let s=seed,c='';const r=()=>{s=(s*9301+49297)%233280;return s/233280};for(let y=0;y<21;y++)for(let x=0;x<21;x++){const k=(x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13);let on;if(k){const a=x>13?x-14:x,b=y>13?y-14:y;on=(a===0||a===6||b===0||b===6||(a>=2&&a<=4&&b>=2&&b<=4))}else on=r()>.52;if(on)c+=`<rect x="${x}" y="${y}" width="1" height="1"/>`}return `<svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${c}</svg>`}
+function thumb(p){return `<div class="thumb" style="--glow:hsl(${p.hue},48%,25%)">${burst(Number(p.code)*7,p.hue,26)}<span class="code">No. ${p.code}</span></div>`}
+function pcard(p){const off=p.on===0;return `<div class="card flat hover" data-act="product" data-id="${p.id}">${thumb(p)}<div class="pname">${p.name}</div><div class="pcode">${p.spec}</div><div class="row between" style="margin-top:9px"><span class="tag ${off?'s4':''}">${off?'已下架':'可加购'}</span><button class="btn mini ${off?'ghost':''}" data-act="add" data-id="${p.id}" ${off?'disabled':''}>加入</button></div></div>`}
+function cartItem(c){
+ if(c.type==='package'){const k=S.packages.find(x=>x.id===c.id);return k?{name:k.name,code:'套餐',hue:k.hue,price:k.price,seed:Number(c.id.slice(1))*311,spec:'套餐组合'}:null}
+ const x=S.products.find(y=>y.id===c.id);return x?{name:x.name,code:x.code,hue:x.hue,price:x.price,seed:Number(x.code)*7,spec:x.spec}:null
+}
+function pkgNames(k){return k.contains.map(id=>{const p=S.products.find(x=>x.id===id);return p?p.name:''}).filter(Boolean)}
+function savePackage(d){
+ const contains=Array.isArray(d.contains)?d.contains.filter(id=>S.products.some(p=>p.id===id)):[];
+ const data={name:String(d.name||'').trim()||'未命名套餐',desc:String(d.desc||'').trim(),price:Number(d.price)||0,contains};
+ if(d.id){const k=S.packages.find(x=>x.id===d.id);if(k)Object.assign(k,data)}
+ else S.packages.unshift({id:'K'+Date.now().toString().slice(-5),hue:(S.packages.length*67+32)%360,on:1,...data});
+ S._pkgDraft=null;S.modal=null;
+}
+function deletePackage(id){S.packages=S.packages.filter(k=>k.id!==id);S.cart=S.cart.filter(c=>!(c.type==='package'&&c.id===id));S.modal=null}
+function togglePackage(id){const k=S.packages.find(x=>x.id===id);if(k)k.on=k.on?0:1}
+function toggleDraftProduct(id){if(!S._pkgDraft)return;const a=Array.isArray(S._pkgDraft.contains)?S._pkgDraft.contains:[];S._pkgDraft.contains=a.includes(id)?a.filter(x=>x!==id):[...a,id]}
+function note_(t){return `<div class="notice">${t}</div>`}
+function orderCard(o,showMoney){
+ return `<div class="item" data-act="order" data-no="${o.no}"><div class="row between"><span class="ttl">${esc(o.who)} <span style="font-size:9.5px;color:#7C8CA6;font-family:var(--num)">${o.tel}</span></span>${stTag(o.status)}</div><div class="sub">${o.no} · ${o.date}</div><div class="sub">${o.items.map(i=>i.name+'（'+i.spec+'）×'+i.qty).join('、')}</div><div class="row between" style="margin-top:7px"><span class="sub">备注：${esc(o.note)||'无'}</span>${showMoney?`<b class="gold" style="font-family:var(--num);font-size:12px">${money(amt(o))}</b>`:''}</div></div>`;
+}
+function videoCard(){
+ return `<div class="card hover" data-act="video"><div class="row"><div class="vplay"><svg viewBox="0 0 20 20"><path d="M7 4.2l8.5 5.8L7 15.8z"/></svg></div><div style="flex:1;margin-left:11px"><div class="vtitle">烟花效果实拍</div><div class="muted">商户提供素材 · 云存储播放</div></div><div class="vburst">${burst(921,40,20)}</div></div></div>`;
+}
+function renderCustomer(){
+ const p=S.page;
+ if(p==='home')return `<div class="hero"><div class="burst">${burst(115,42,30)}</div><div class="eyebrow">Collection / 2026</div><h2>${esc(S.slogan)}</h2><p>烟花效果视频 · 产品 · 套餐 · 选品登记</p><div class="rule"></div></div>
+  ${videoCard()}
+  <div class="chips">${['全部','雷类','组合','儿童'].map(c=>`<div class="chip ${S.cat===c?'on':''}" data-act="cat" data-cat="${c}">${c}</div>`).join('')}</div>
+  <div class="sec"><h3>精选产品</h3><small class="hit" data-act="nav" data-page="goods">全部 ›</small></div>
+  <div class="grid2">${S.products.filter(x=>x.on).slice(0,4).map(pcard).join('')}</div>
+  <div class="sec"><h3>推荐套餐</h3></div>
+  ${S.packages.filter(k=>k.on).map(k=>`<div class="card row hover" data-act="package" data-id="${k.id}"><div class="vburst">${burst(k.name.length*137,k.hue,18)}</div><div style="flex:1;margin-left:11px"><div class="vtitle">${esc(k.name)}</div><div class="muted">${esc(k.desc||pkgNames(k).join(' · '))}</div></div><span class="gold" style="font-size:10px;white-space:nowrap">查看 ›</span></div>`).join('')||'<div class="empty">暂无上架套餐</div>'}
+  ${note_('本小程序只做选品登记，不收取任何款项；核对货品与付款均在线下完成。客户端全程不显示金额。')}`;
+ if(p==='goods'){const cs=['全部',...new Set(S.products.map(x=>x.cat))],list=S.products.filter(x=>S.cat==='全部'||x.cat===S.cat);
+  return `<div class="chips">${cs.map(c=>`<div class="chip ${S.cat===c?'on':''}" data-act="cat" data-cat="${c}">${c}</div>`).join('')}</div><div class="grid2">${list.map(pcard).join('')}</div>${note_('库存按单品 / 单组 / 单件三层独立计算；某层缺货只禁该层数量选择，商品仍然展示。')}`}
+ if(p==='cart'||p==='checkout'){
+  const rows=S.cart.map(c=>{const x=cartItem(c);if(!x)return '';return `<div class="item row"><div style="width:42px;height:42px;flex-shrink:0;border-radius:7px;overflow:hidden;position:relative;background:radial-gradient(circle,hsl(${x.hue},48%,25%),#0A1222)">${burst(x.seed,x.hue,18)}</div><div style="flex:1;min-width:0;margin-left:9px"><div class="ttl" style="margin-bottom:3px">${x.name}</div><div class="sub">${c.spec} · ${x.spec}</div></div><div class="qty"><button data-act="qty" data-id="${c.id}" data-spec="${c.spec}" data-d="-1">−</button><span>${c.qty}</span><button data-act="qty" data-id="${c.id}" data-spec="${c.spec}" data-d="1">＋</button></div></div>`}).join('');
+  if(p==='cart')return `<div class="sec"><h3>选品单</h3><small>${S.cart.reduce((s,c)=>s+c.qty,0)} 件</small></div>${rows||'<div class="empty">还没有选品</div>'}${rows?`<button class="btn" data-act="nav" data-page="checkout" style="margin-top:12px">去提交订单</button>`:''}${note_('选品单不显示小计、不显示金额。')}`;
+  return `<div class="sec"><h3>填写提货信息</h3></div><div class="card"><label class="f">姓名 / 超市名头（不限字数）</label><input class="f" data-field="who" value="${esc(S.form.who)}" placeholder="姓名或超市名头"><label class="f">电话 <span class="pill">首次填写后沿用</span></label><input class="f" data-field="tel" value="${esc(S.form.tel)}" placeholder="11 位手机号"><label class="f">备注（可写送货地点与时间）</label><textarea class="f" data-field="note" placeholder="例如：预定今晚 3 点把货送到某某地方">${esc(S.form.note)}</textarea></div>
+   <div class="sec"><h3>本次选品</h3></div><div class="card">${S.cart.map(c=>{const x=cartItem(c);return x?`<div class="row between" style="margin-bottom:7px"><span style="font-size:11.5px">${x.name}（${c.spec}）</span><span class="muted">× ${c.qty}</span></div>`:''}).join('')}</div>
+   <button class="btn" data-act="submit">提交订单</button>${note_('没有地址字段、没有金额、没有支付方式。提交后订单进入商户后台，商户登录查看；客户可在「订单」自行查看状态。')}`;
+ }
+ if(p==='orders'){const mine=S.orders.filter(o=>o.mine);return `<div class="sec"><h3>我的订单</h3><small>${mine.length} 单</small></div>${mine.map(o=>orderCard(o,false)).join('')||'<div class="empty">还没有订单</div>'}${note_('状态：已提交(待确认) → 已确认(备货中) → 已完成 / 已取消。客户侧不显示金额。')}`}
+ return `<div class="card row"><div class="seal" style="width:42px;height:42px;font-size:12px">CC</div><div style="margin-left:11px"><div class="vtitle">${esc(S.profile.who)}</div><div class="muted">${esc(S.profile.tel)} · 微信已登录</div></div></div>
+  <div class="sec"><h3>客户档案</h3></div><div class="card"><div class="row between" style="margin-bottom:8px"><span class="muted">姓名 / 名头</span><span style="font-size:11.5px">${esc(S.profile.who)}</span></div><div class="row between"><span class="muted">电话</span><span style="font-size:11.5px;font-family:var(--num)">${esc(S.profile.tel)}</span></div></div>
+  <div class="sec"><h3>联系商户</h3></div><div class="card" style="text-align:center"><div class="qr">${qr(7788)}</div><div class="vtitle">长按识别加好友</div><div class="muted" style="margin-top:5px">货品核对与付款均在线下沟通</div></div>${note_('演示用二维码占位，正式版替换为商户微信二维码。')}`;
+}
+function renderMerchant(){
+ const p=S.page,all=S.orders;
+ if(p==='overview'){const pend=all.filter(o=>o.status==='已提交').length,total=all.filter(o=>o.status!=='已取消').reduce((s,o)=>s+amt(o),0);
+  return `<div class="stat"><div><b>${all.length}</b><span>全部订单</span></div><div><b>${pend}</b><span>待确认</span></div><div><b>${S.products.filter(x=>x.on).length}</b><span>在售商品</span></div></div>
+   <div class="card"><div class="row between"><span class="muted">订单登记金额（仅后台）</span><b class="gold" style="font-family:var(--num);font-size:18px;font-weight:400">${money(total)}</b></div><div class="muted" style="margin-top:6px">不含已取消订单 · 客户侧不可见</div></div>
+   <div class="sec"><h3>待办</h3></div><div class="grid2"><button class="btn ghost" data-act="nav" data-page="orders">处理新订单 ${pend}</button><button class="btn ghost" data-act="nav" data-page="products">维护商品</button></div>
+   ${note_('本版本只有客户与商户两套页面；订单由商户在后台查看与确认，不做自动推送。')}`}
+ if(p==='orders'){const opts=['全部','已提交','已确认','已完成','已取消'],list=all.filter(o=>S.filterStatus==='全部'||o.status===S.filterStatus);
+  return `<div class="row" style="gap:8px;margin-bottom:12px"><select class="f" data-field="filterStatus" style="flex:1">${opts.map(x=>`<option ${S.filterStatus===x?'selected':''}>${x}</option>`).join('')}</select><button class="btn mini ghost" data-act="export">导出</button></div>
+   ${list.map(o=>`<div class="item"><div data-act="order" data-no="${o.no}"><div class="row between"><span class="ttl">${esc(o.who)} <span style="font-size:9.5px;color:#7C8CA6;font-family:var(--num)">${o.tel}</span></span>${stTag(o.status)}</div><div class="sub">${o.no} · ${o.date}</div><div class="sub">${o.items.map(i=>i.name+'×'+i.qty).join('、')}　备注：${esc(o.note)}</div><div class="row between" style="margin-top:7px"><span class="muted">登记金额（后台）</span><b class="gold" style="font-family:var(--num);font-size:12px">${money(amt(o))}</b></div></div>${o.status==='已提交'?`<button class="btn mini" style="margin-top:9px" data-act="confirm-order" data-no="${o.no}">确定 · 开始备货</button>`:''}</div>`).join('')}
+   ${note_('点「确定」后订单变「已确认」，客户在「订单」自行查看状态；按无资质不发自动推送。')}`}
+ if(p==='products')return `<div class="row between" style="margin-bottom:12px"><span class="muted">共 ${S.products.length} 个（正式版 75 个）</span><span class="tag">登记价仅后台可见</span></div>
+  ${S.products.map(x=>`<div class="item"><div class="row"><div style="width:44px;height:44px;flex-shrink:0;border-radius:7px;overflow:hidden;position:relative;background:radial-gradient(circle,hsl(${x.hue},48%,25%),#0A1222)">${burst(Number(x.code)*7,x.hue,18)}</div><div style="flex:1;min-width:0;margin-left:10px"><div class="ttl">${x.name}</div><div class="sub">编号 ${x.code} · ${x.spec}</div><div class="sub">库存 单品 ${x.stk[0]} / 单组 ${x.stk[1]} / 单件 ${x.stk[2]}</div></div></div><div class="row" style="margin-top:9px;gap:7px"><span class="muted" style="flex:1">登记价</span><input class="f" style="width:76px;padding:6px 8px" type="number" data-field="price" data-id="${x.id}" value="${x.price}"><button class="btn mini ${x.on?'ghost':''}" data-act="toggle-product" data-id="${x.id}">${x.on?'已上架':'已下架'}</button></div></div>`).join('')}
+  ${note_('字段全非必填，不填 / 不加图也能上架；规格库存不填就不在客户端显示。改价不影响历史订单的价格快照。')}`;
+ const tabs=[['home','首页配置'],['packages','套餐维护'],['customers','客户'],['logs','操作记录']];
+ let body='';
+ if(S.adminTab==='home')body=`<div class="card"><label class="f">首页宣传语（切到客户端查看效果）</label><input class="f" data-field="slogan" value="${esc(S.slogan)}"><label class="f">名头图 / 宣传图</label><div class="card flat" style="text-align:center;margin:0"><div style="width:100%;height:76px;border:1px dashed var(--line2);border-radius:7px;display:flex;align-items:center;justify-content:center"><span class="muted">图片上传位置（演示占位）</span></div></div><label class="f">加好友二维码</label><div class="qr">${qr(7788)}</div></div>${note_('首页宣传图、标语、名头图均由商户在后台自行更换。')}`;
+ if(S.adminTab==='packages')body=`<button class="btn" data-act="new-package" style="margin-bottom:12px">＋ 新增套餐</button>`+S.packages.map(k=>`<div class="card hover" data-act="package" data-id="${k.id}"><div class="row"><div class="vburst">${burst(k.name.length*137,k.hue,18)}</div><div style="flex:1;min-width:0;margin-left:11px"><div class="vtitle">${esc(k.name)}</div><div class="muted">${esc(k.desc||pkgNames(k).join(' · '))}</div><div class="sub" style="margin-top:4px">包含 ${k.contains.length} 项：${esc(pkgNames(k).join('、'))||'尚未选择产品'} · 登记价 ${money(k.price)}</div></div><span class="tag ${k.on?'s2':'s4'}">${k.on?'已上架':'已下架'}</span></div><div class="row" style="margin-top:11px;gap:7px"><button class="btn mini ghost" data-act="edit-package" data-id="${k.id}">编辑内容</button><button class="btn mini ghost" data-act="toggle-package" data-id="${k.id}">${k.on?'下架':'上架'}</button><span style="flex:1"></span><span class="muted" style="font-size:9.5px">查看 ›</span></div></div>`).join('')+note_('新增、编辑、上下架、删除都在这里；下架后客户端不再展示。客户端只看到套餐内容，不显示价格。');
+ if(S.adminTab==='customers'){const cs=[...new Map(all.map(o=>[o.tel,o])).values()];body=`<div class="sec"><h3>客户档案</h3><small>${cs.length} 位</small></div>`+cs.map(o=>`<div class="item"><div class="row between"><span class="ttl">${esc(o.who)}</span><span class="tag">${all.filter(x=>x.tel===o.tel).length} 单</span></div><div class="sub">${o.tel}<br>最近备注：${esc(o.note)}</div></div>`).join('')+note_('不强制授权才能浏览；定位第一版不做。')}
+ if(S.adminTab==='logs')body=`<div class="sec"><h3>操作记录</h3></div>`+S.logs.map(n=>`<div class="item"><div class="row between"><span class="ttl">${n.e}</span><span class="tag">${n.t}</span></div><div class="sub">对象：${n.to}<br>方式：后台站内留痕 · 线下微信 / 电话沟通</div></div>`).join('')+note_('按无认证服务号处理：不做公众号模板消息；商户登录后台查看新订单。一次性订阅消息留作二期可选。');
+ return `<div class="stabs">${tabs.map(t=>`<div class="stab ${S.adminTab===t[0]?'on':''}" data-act="admin-tab" data-tab="${t[0]}">${t[1]}</div>`).join('')}</div>${body}`;
+}
+function renderModal(){
+ const host=document.getElementById('modalHost'),m=S.modal;
+ if(!m){host.innerHTML='';return}
+ let b='';
+ if(m.type==='product'){const x=S.products.find(p=>p.id===m.id);
+  b=`<h3>${x.name}<span class="close" data-act="close">关闭</span></h3>${thumb(x)}<div class="muted" style="margin:11px 0">编号 ${x.code} · ${x.spec}</div>
+   <div class="card hover" data-act="video"><div class="row"><div class="vplay"><svg viewBox="0 0 20 20"><path d="M7 4.2l8.5 5.8L7 15.8z"/></svg></div><div style="margin-left:11px"><div class="vtitle">观看烟花效果</div><div class="muted">商户实拍 · 云存储播放</div></div></div></div>
+   <div class="card"><div class="vtitle" style="margin-bottom:10px">选择规格（三层库存独立）</div>${['单品','单组','单件'].map((s,i)=>`<div class="row between" style="margin-bottom:8px"><span style="font-size:11px">${s}　<span class="muted">库存 ${x.stk[i]}</span></span><button class="btn mini ${x.stk[i]===0?'ghost':''}" data-act="add" data-id="${x.id}" data-spec="${s}" ${x.stk[i]===0?'disabled':''}>加入</button></div>`).join('')}</div>
+   ${note_('客户端不显示价格。图片与视频由商户提供，字段可不填也能上架。')}`}
+ if(m.type==='order'){const o=S.orders.find(x=>x.no===m.no);
+  b=`<h3>订单详情<span class="close" data-act="close">关闭</span></h3><div class="item"><div class="row between"><span class="ttl">${esc(o.who)}</span>${stTag(o.status)}</div><div class="sub">${o.no}<br>${o.date}<br>${o.tel}<br>备注：${esc(o.note)||'无'}</div></div>
+   <div class="card">${o.items.map(i=>`<div class="row between" style="margin-bottom:7px"><span style="font-size:11.5px">${i.name}（${i.spec}）× ${i.qty}</span>${S.role==='customer'?'':`<span class="muted" style="font-family:var(--num)">${money(i.price*i.qty)}</span>`}</div>`).join('')}${S.role==='customer'?'':`<div class="row between" style="border-top:1px solid var(--line);padding-top:9px;margin-top:3px"><b style="font-size:11.5px">合计（后台）</b><b class="gold" style="font-family:var(--num);font-size:14px;font-weight:400">${money(amt(o))}</b></div>`}</div>
+   <div class="sec" style="margin:14px 0 7px"><h3>状态流转</h3></div><div class="timeline"><div>${o.date}　订单已提交</div>${o.status!=='已提交'?`<div>商户已确定，开始备货</div>`:''}${o.status==='已完成'?`<div>订单已完成</div>`:''}${o.status==='已取消'?`<div>订单已取消</div>`:''}</div>
+   ${note_('只登记订单，不支付、不结算。')}`}
+ if(m.type==='package'){const k=S.packages.find(x=>x.id===m.id)||S.packages[0];
+  b=`<h3>${esc(k.name)}<span class="close" data-act="close">关闭</span></h3><div class="card" style="text-align:center;padding:14px"><div style="width:138px;height:138px;margin:0 auto">${burst(k.name.length*137,k.hue,28)}</div><div class="muted" style="margin-top:8px">${esc(k.desc||pkgNames(k).join(' · '))}</div></div>
+   <div class="sec" style="margin:15px 0 8px"><h3>包含产品</h3><small>${k.contains.length} 项</small></div><div class="card">${k.contains.map(cid=>{const p=S.products.find(x=>x.id===cid);return p?`<div class="row between" style="margin-bottom:8px"><span style="font-size:11.5px">${p.name}</span><span class="pcode">No. ${p.code}</span></div>`:''}).join('')||'<div class="muted">尚未选择产品</div>'}</div>
+   ${S.role==='customer'?`<button class="btn" data-act="add-package" data-id="${k.id}">把套餐加入选品单</button>`:`<button class="btn ghost" data-act="close">返回</button>`}${note_('客户端不显示价格；提交订单后由商户线下核对货品与沟通。')}`}
+ if(m.type==='pkgEdit'){
+  const k=m.id?S.packages.find(x=>x.id===m.id):null,key=m.id||'new';
+  if(!S._pkgDraft||S._pkgDraft._for!==key)S._pkgDraft={_for:key,id:m.id||null,name:k?k.name:'',desc:k?k.desc:'',price:k?k.price:'',contains:k?[...k.contains]:[]};
+  const d=S._pkgDraft;
+  b=`<h3>${k?'编辑套餐':'新增套餐'}<span class="close" data-act="close">关闭</span></h3><div class="card"><label class="f">套餐名称</label><input class="f" data-field="pkgName" value="${esc(d.name)}" placeholder="例如：开业大吉套餐"><label class="f">展示说明（可不填，默认列出所选产品）</label><input class="f" data-field="pkgDesc" value="${esc(d.desc)}" placeholder="客户端展示的一句话说明"><label class="f">登记价（仅后台可见）</label><input class="f" type="number" data-field="pkgPrice" value="${d.price}" placeholder="0"></div>
+   <div class="sec" style="margin:15px 0 8px"><h3>从产品库选择</h3><small>已选 <b class="gold">${d.contains.length}</b> 项</small></div>
+   <div class="card" style="max-height:216px;overflow-y:auto">${S.products.map(p=>`<div class="pick ${d.contains.includes(p.id)?'on':''}" data-act="pick-product" data-id="${p.id}"><div class="box">${d.contains.includes(p.id)?'✓':''}</div><div class="mini-thumb" style="background:radial-gradient(circle,hsl(${p.hue},48%,25%),#0A1222)">${burst(Number(p.code)*7,p.hue,14)}</div><div class="pn">${p.name}</div><span class="pc">No. ${p.code}</span></div>`).join('')}</div>
+   <button class="btn" style="margin-top:12px" data-act="save-package">保存套餐</button>${k?`<button class="btn ghost" style="margin-top:9px" data-act="delete-package" data-id="${k.id}">删除这个套餐</button>`:''}${note_('先填套餐信息，再从产品库勾选产品；不勾也能保存。客户端只展示内容不显示价格。')}`}
+ if(m.type==='video')b=`<h3>烟花效果视频<span class="close" data-act="close">关闭</span></h3><div class="card" style="text-align:center;padding:22px 14px"><div style="width:170px;height:170px;margin:0 auto">${burst(2026,40,32)}</div><div class="muted" style="margin-top:12px">演示占位：正式版播放商户提供的实拍视频，文件放云存储</div></div><button class="btn ghost" data-act="close">知道了</button>`;
+ host.innerHTML=`<div class="mbg" data-act="close-bg"><div class="modal">${b}</div></div>`;
+}
+function render(){
+ const r=S.role,c=TABS[r];
+ document.getElementById('rTitle').textContent=ROLE[r][0];
+ document.getElementById('rSub').textContent=ROLE[r][1];
+ document.querySelectorAll('.switch button').forEach(b=>b.classList.toggle('on',b.dataset.role===r));
+ document.getElementById('tabbar').innerHTML=c.map(t=>`<button data-act="nav" data-page="${t.k}" class="${S.page===t.k||(r==='customer'&&S.page==='checkout'&&t.k==='cart')?'on':''}">${icon(t.i)}${t.n}</button>`).join('');
+ const key=r+'/'+S.page,keep=S._key===key,s=document.getElementById('screen'),y=s.scrollTop;
+ s.innerHTML=({customer:renderCustomer,merchant:renderMerchant})[r]();
+ s.scrollTop=keep?y:0;S._key=key;renderModal();
+}
+document.addEventListener('click',e=>{
+ const el=e.target.closest('[data-act]');if(!el)return;
+ const a=el.dataset.act,id=el.dataset.id,no=el.dataset.no;
+ if(a==='close-bg'&&e.target!==el)return;
+ if(a==='role'){S.role=el.dataset.role;S.page=TABS[S.role][0].k;S.modal=null;render();return}
+ if(a==='nav'){S.page=el.dataset.page;S.modal=null;render();return}
+ if(a==='cat'){S.cat=el.dataset.cat;S.page=S.role==='customer'?'goods':S.page;render();return}
+ if(a==='product'){S.modal={type:'product',id};renderModal();return}
+ if(a==='package'){S.modal={type:'package',id};renderModal();return}
+ if(a==='order'){S.modal={type:'order',no};renderModal();return}
+ if(a==='video'){S.modal={type:'video'};renderModal();return}
+ if(a==='close'||a==='close-bg'){S.modal=null;renderModal();return}
+ if(a==='add'){const spec=el.dataset.spec||'单件',c=S.cart.find(x=>x.id===id&&x.spec===spec);if(c)c.qty++;else S.cart.push({id,spec,qty:1});S.modal=null;render();toast('已加入选品单（'+spec+'）');return}
+ if(a==='add-package'){const c=S.cart.find(x=>x.id===id&&x.type==='package');if(c)c.qty++;else S.cart.push({id,type:'package',spec:'套餐',qty:1});S.modal=null;render();toast('套餐已加入选品单');return}
+ if(a==='qty'){const c=S.cart.find(x=>x.id===id&&x.spec===el.dataset.spec);if(!c)return;c.qty+=Number(el.dataset.d);if(c.qty<=0)S.cart=S.cart.filter(x=>x!==c);render();return}
+ if(a==='submit'){
+  if(!S.cart.length){toast('选品单是空的');return}
+  if(!S.form.who||!S.form.tel){toast('请填姓名和电话');return}
+  const no='NO'+Date.now(),items=S.cart.map(c=>{const x=cartItem(c);return{name:x.name,spec:c.spec,qty:c.qty,price:x.price}});
+  S.orders.unshift({no,who:S.form.who,tel:S.form.tel,note:S.form.note||'（未填）',status:'已提交',date:'2026-11-12 刚刚',mine:1,items});
+  S.profile.who=S.form.who;S.profile.tel=S.form.tel;S.form.note='';S.cart=[];S.page='orders';
+  logEvent('新订单提交','商户后台 · 待确认列表');render();return
+ }
+ if(a==='confirm-order'){const o=S.orders.find(x=>x.no===no);o.status='已确认';logEvent('订单确认备货','客户 '+o.who+'（自行查看）');render();return}
+ if(a==='export'){toast('导出功能演示占位');return}
+ if(a==='admin-tab'){S.adminTab=el.dataset.tab;render();return}
+ if(a==='pick-product'){toggleDraftProduct(id);renderModal();return}
+ if(a==='new-package'){S._pkgDraft=null;S.modal={type:'pkgEdit',id:null};renderModal();return}
+ if(a==='edit-package'){S._pkgDraft=null;S.modal={type:'pkgEdit',id};renderModal();return}
+ if(a==='save-package'){if(!S._pkgDraft){toast('请先打开套餐编辑');return}if(!String(S._pkgDraft.name||'').trim()){toast('请填套餐名称');return}savePackage(S._pkgDraft);render();toast('套餐已保存');return}
+ if(a==='delete-package'){deletePackage(id);render();toast('套餐已删除');return}
+ if(a==='toggle-package'){togglePackage(id);render();toast('上架状态已更新');return}
+ if(a==='toggle-product'){const x=S.products.find(y=>y.id===id);x.on=x.on?0:1;render();return}
+});
+function onField(e){
+ const f=e.target.dataset.field;if(!f)return;
+ if(f==='who'||f==='tel'||f==='note'){S.form[f]=e.target.value;return}
+ if(f==='slogan'){S.slogan=e.target.value;return}
+ if(f==='price'){const x=S.products.find(y=>y.id===e.target.dataset.id);if(x)x.price=Number(e.target.value)||0;return}
+ if(f==='filterStatus'){S.filterStatus=e.target.value;render();return}
+ if(f==='pkgName'||f==='pkgDesc'||f==='pkgPrice'){if(S._pkgDraft)S._pkgDraft[{pkgName:'name',pkgDesc:'desc',pkgPrice:'price'}[f]]=e.target.value;return}
+}
+document.addEventListener('input',onField);
+document.addEventListener('change',onField);
+S.form.who=S.profile.who;S.form.tel=S.profile.tel;render();
+</script>
+</body>
+</html>
