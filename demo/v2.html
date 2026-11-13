@@ -12943,7 +12943,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 'use strict';
 /* =======================================================================
    SparkCart V2.1 · 深靛夜空 + 香槟金
-   三角色（客户 / 代理 / 运营方）· 即时通讯 · 每代理一码扫码绑定
+   三角色（客户 / 代理 / 运营方）· 即时通讯 · 每代理一码扫码即归属
    ======================================================================= */
 const LS_KEY = 'sparkcart.v21.demo';
 const SCHEMA = 3;
@@ -13023,14 +13023,14 @@ const THREAD_SEED = [
   {id:'T02',kind:'ao',agent:'AG02',unread:{customer:0,agent:0,operator:1},msgs:[
     {by:'agent',t:'2026-11-12 09:14',text:'张总，南关王老板要400一箱+115两箱，今晚3点送到，库房400还有货吧？'},
     {by:'operator',t:'2026-11-12 09:16',text:'400还有9件，够。让他小程序提交，我看到就确认备货。'},
-    {by:'agent',t:'2026-11-12 10:05',text:'另外11月5号那单（赵经理婚庆）我单独打了个账期提交了，麻烦财务看下。'}
+    {by:'agent',t:'2026-11-12 10:05',text:'另外11月5号那单（赵经理婚庆）我发了个结算请求，麻烦财务看下。'}
   ]},
   {id:'T03',kind:'ca',cu:'CU04',agent:'AG03',pid:'P300',unread:{customer:1,agent:0,operator:0},msgs:[
     {by:'customer',t:'2026-11-08 10:15',text:'168发轰天雷三箱，走物流到二道，能给个实价吗？',card:{type:'product',id:'P300'}},
     {by:'agent',t:'2026-11-08 10:22',text:'孙老板，系统里显示的就是统一价，三箱以上我去跟总店申请个运费补贴，晚点电话您。'}
   ]},
   {id:'T04',kind:'ao',agent:'AG03',unread:{customer:0,agent:1,operator:0},msgs:[
-    {by:'agent',t:'2026-11-12 08:50',text:'张总，11月3号李婶那单我提了个账期，金额330，麻烦确认。'},
+    {by:'agent',t:'2026-11-12 08:50',text:'张总，11月3号李婶那单我提了个结算请求，金额330米，麻烦确认。'},
     {by:'operator',t:'2026-11-12 09:01',text:'收到，今天一起结。'}
   ]},
   {id:'T05',kind:'ca',cu:'CU06',agent:'AG01',pid:'P880',unread:{customer:0,agent:0,operator:0},msgs:[
@@ -13056,7 +13056,7 @@ const VIEWS_SEED = [
 const $ = (s,r)=> (r||document).querySelector(s);
 const $$ = (s,r)=> Array.from((r||document).querySelectorAll(s));
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money = n => '¥' + Number(n||0).toLocaleString('zh-CN',{maximumFractionDigits:0});
+const money = n => '🌾' + Number(n||0).toLocaleString('zh-CN',{maximumFractionDigits:0}) + '米';
 const pad = n => String(n).padStart(2,'0');
 function nowStamp(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
 function clockHM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())}
@@ -13082,13 +13082,13 @@ function seedState(){
     series:clone(SERIES_SEED),products:clone(PRODUCT_SEED).map(p=>({...p,on:1,imgs:3})),
     packages:clone(PACKAGE_SEED),agents:clone(AGENT_SEED),customers:clone(CUSTOMER_SEED),
     orders:clone(ORDER_SEED),settlements:clone(SETTLE_SEED),threads:clone(THREAD_SEED),
-    home:clone(HOME_SEED),views:clone(VIEWS_SEED),
+    home:clone(HOME_SEED),views:clone(VIEWS_SEED),settings:{chatTarget:'agent'},
     logs:[
       {t:'2026-11-12 10:02',e:'新订单提交',to:'HW261112008 · 宏伟自营',by:'客户 吴总'},
       {t:'2026-11-12 09:20',e:'新订单提交',to:'HW261112001 · 南关李代理',by:'客户 王老板'},
       {t:'2026-11-12 09:16',e:'代理↔运营方 消息',to:'T02 · 库存确认',by:'南关李代理'},
       {t:'2026-11-11 15:50',e:'订单确认备货',to:'HW261111002',by:'运营方'},
-      {t:'2026-11-10 09:15',e:'结算单确认',to:'ST261101 · ¥1,079',by:'运营方'}
+      {t:'2026-11-10 09:15',e:'结算请求确认',to:'ST261101 · 🌾1,079米',by:'运营方'}
     ],
     ui:{
       slots:{A:{role:'customer',page:'home',cu:'CU01',agent:'AG01',cat:'全部',q:'',sort:'default',modal:null,thread:null,adminTab:null,sel:[],psel:[],chatDraft:'',form:{who:'王老板 · 南关××超市',tel:'13800001111',note:''}},
@@ -13140,16 +13140,19 @@ function threadsFor(sl){
 function unreadFor(sl){return threadsFor(sl).reduce((s,t)=>s+(t.unread[sl.role]||0),0)}
 function threadTitle(t,role){
   if(t.kind==='ca'){const c=cust(t.cu),a=agent(t.agent);return role==='customer'?(a?a.name:'代理'):(c?c.who:'客户')}
+  if(t.kind==='co'){const c=cust(t.cu);return role==='customer'?'总店 · 张宏伟':(c?c.who:'客户')}
   const a=agent(t.agent);return role==='agent'?'运营方 · 张宏伟':(a?a.name:'代理');
 }
 function threadSub(t,role){
   if(t.kind==='ca')return role==='customer'?'产品咨询 · 由您的服务代理回复':'客户咨询'+(t.pid&&prod(t.pid)?' · '+prod(t.pid).name:'');
+  if(t.kind==='co')return role==='customer'?'直聊总店 · 订单与备货':'客户直聊 · 订单与备货';
   return role==='agent'?'备货 / 库存 / 结算 沟通':'代理沟通 · 备货 / 结算';
 }
 function lastMsg(t){return t.msgs[t.msgs.length-1]}
 function ensureThread(kind,cu,ag,pid){
-  let t=S.threads.find(x=>x.kind===kind&&(kind==='ca'?(x.cu===cu&&x.agent===ag&&((x.pid||null)===(pid||null))):x.agent===ag));
-  if(!t){t={id:uid('T'),kind,cu:cu||null,agent:ag,pid:pid||null,unread:{customer:0,agent:0,operator:0},msgs:[]};S.threads.unshift(t)}
+  const key=kind==='ca'?(x=>x.cu===cu&&x.agent===ag&&((x.pid||null)===(pid||null))):(kind==='co'?(x=>x.cu===cu):(x=>x.agent===ag));
+  let t=S.threads.find(x=>x.kind===kind&&key(x));
+  if(!t){t={id:uid('T'),kind,cu:cu||null,agent:ag||null,pid:pid||null,unread:{customer:0,agent:0,operator:0},msgs:[]};S.threads.unshift(t)}
   return t;
 }
 function pushMsg(t,by,text,card){
@@ -13161,9 +13164,9 @@ function pushMsg(t,by,text,card){
   save();
 }
 function threadVisibleTo(t,r){
-  if(r==='customer')return t.kind==='ca';
-  if(r==='agent')return true;
-  return t.kind==='ao';
+  if(r==='customer')return t.kind==='ca'||t.kind==='co';
+  if(r==='agent')return t.kind!=='co';
+  return t.kind==='ao'||t.kind==='co';
 }
 function markRead(t,r){t.unread[r]=0;save()}
 function logEvent(e,to,by){S.logs.unshift({t:nowStamp(),e,to,by:by||'系统'});if(S.logs.length>80)S.logs.length=80}
@@ -13260,7 +13263,9 @@ const SERIES_ICON={
 const sicon=k=>'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(SERIES_ICON[k]||SERIES_ICON.burst)+'</svg>';
 function thumb(p,cls){return '<div class="thumb '+(cls||'')+'" style="--glow:hsl('+p.hue+',48%,25%)">'+burst(Number(p.code||7)*7,p.hue,26)+'<span class="code">No. '+esc(p.code||'')+'</span></div>'}
 function miniThumb(hue,seed){return '<div style="width:100%;height:100%;position:relative;background:radial-gradient(circle,hsl('+hue+',48%,25%),#0A1222)">'+burst(seed,hue,16)+'</div>'}
-function stTag(s){const m={'已提交':'wait','已确认':'ok','已完成':'done','已取消':'off','待结算':'wait','已结算':'ok','未出账':'gold','已出账':'wait'};return '<span class="st '+(m[s]||'gold')+'">'+esc(s)+'</span>'}
+const SLBL={'未出账':'未结算','已出账':'结算中'};
+function settleLabel(s){return SLBL[s]||s}
+function stTag(s){const m={'已提交':'wait','已确认':'ok','已完成':'done','已取消':'off','待结算':'wait','已结算':'ok','未出账':'gold','已出账':'wait'};return '<span class="st '+(m[s]||'gold')+'">'+esc(settleLabel(s))+'</span>'}
 function note_(t){return '<div class="notice">'+t+'</div>'}
 function empty(t,ic){return '<div class="empty"><div class="eb">'+icon(ic||'box')+'</div>'+t+'</div>'}
 function avatarFor(role,name,sm){return '<div class="avatar '+role.slice(0,1)+' '+(sm?'sm':'')+'">'+esc(String(name||'?').replace(/^(宏伟自营|南关|宽城|九台)/,'').slice(0,1))+'</div>'}
@@ -13287,8 +13292,8 @@ function parseAgentCode(text){
 
 /* ======================= 应用骨架 ======================= */
 const TABS={
-  customer:[{k:'home',n:'首页',i:'home'},{k:'goods',n:'选品',i:'grid'},{k:'cart',n:'选品单',i:'bag'},{k:'chat',n:'消息',i:'chat'},{k:'my',n:'我的',i:'user'}],
-  agent:[{k:'work',n:'工作台',i:'chart'},{k:'orders',n:'订单',i:'list'},{k:'settle',n:'账期',i:'wallet'},{k:'chat',n:'消息',i:'chat'},{k:'my',n:'我的',i:'user'}],
+  customer:[{k:'home',n:'首页',i:'home'},{k:'goods',n:'选品',i:'grid'},{k:'cart',n:'购物车',i:'bag'},{k:'chat',n:'消息',i:'chat'},{k:'my',n:'我的',i:'user'}],
+  agent:[{k:'work',n:'工作台',i:'chart'},{k:'orders',n:'订单',i:'list'},{k:'settle',n:'结算',i:'wallet'},{k:'chat',n:'消息',i:'chat'},{k:'my',n:'我的',i:'user'}],
   operator:[{k:'overview',n:'概览',i:'chart'},{k:'orders',n:'订单',i:'list'},{k:'products',n:'商品',i:'box'},{k:'settle',n:'结算',i:'wallet'},{k:'chat',n:'消息',i:'chat'},{k:'manage',n:'管理',i:'sliders'}]
 };
 const CART={A:[],B:[]};
@@ -13336,7 +13341,7 @@ function phoneShell(k){
 }
 function c0(sl){return sl.role==='customer'?cust(sl.cu):null}
 function headerMeta(sl){
-  if(sl.role==='customer'){const c=cust(sl.cu),a=c?agent(c.agent):null;return a?a.name:'未绑定代理'}
+  if(sl.role==='customer'){const c=cust(sl.cu),a=c?agent(c.agent):null;return a?a.name:'未选服务代理'}
   if(sl.role==='agent'){const a=agent(sl.agent);return a?a.code:''}
   return '总店 · 宏伟烟花';
 }
@@ -13346,9 +13351,9 @@ function accountLabel(sl){
   return '张宏伟 · 总店';
 }
 function pageTitle(sl){
-  const map={home:'产品画册',goods:'全部产品',series:'产品分类',cart:'选品单',checkout:'确认订单',orders:sl.role==='customer'?'我的订单':'订单管理',
+  const map={home:'产品画册',goods:'全部产品',series:'产品分类',cart:'购物车',checkout:'确认订单',orders:sl.role==='customer'?'我的订单':'订单管理',
     my:sl.role==='customer'?'我的':'代理中心',chat:sl.thread?threadTitle(thread(sl.thread),sl.role):'消息',scan:'扫一扫',
-    work:'代理工作台',settle:sl.role==='agent'?'账期结算':'结算审核',overview:'经营概览',products:'商品管理',manage:'管理中心'};
+    work:'代理工作台',settle:sl.role==='agent'?'结算请求':'结算确认',overview:'经营概览',products:'商品管理',manage:'管理中心'};
   return map[sl.page]||ROLE_TITLE[sl.role];
 }
 function renderPage(k){
@@ -13369,7 +13374,7 @@ function renderSlot(k){
 function renderAll(){renderSlot('A');if(S.ui.rail.showB)renderSlot('B');renderDock();syncChips();save()}
 function syncChips(){
   const c=cust(slotA().cu),a=c?agent(c.agent):null;
-  const el=$('#chipBind');if(el)el.innerHTML='当前客户 <b>'+esc(c?c.who.split(' · ')[0]:'—')+'</b> · 服务代理 <b>'+esc(a?a.name:'未绑定')+'</b>';
+  const el=$('#chipBind');if(el)el.innerHTML='当前客户 <b>'+esc(c?c.who.split(' · ')[0]:'—')+'</b> · 服务代理 <b>'+esc(a?a.name:'未指定')+'</b>';
   const ck=$('#chipClock');if(ck)ck.textContent=clockHM();
 }
 
@@ -13387,8 +13392,8 @@ function renderCustomer(k){
       '<div class="sec"><h3>推荐套餐</h3></div>'+
       S.packages.filter(x=>x.on).map(x=>pkgCard(k,x)).join('')+
       '<div class="spark-line"></div>'+
-      '<div class="card"><div class="row"><div class="avatar a">'+esc(ag?ag.who.slice(0,1):'—')+'</div><div style="flex:1;margin-left:10px;min-width:0"><div class="vtitle">'+esc(ag?ag.name:'尚未绑定服务代理')+'</div><div class="muted">'+esc(ag?ag.area+' · '+ag.tel:'扫代理二维码即可绑定专属服务')+'</div></div>'+
-      (ag?'<button class="btn mini" data-act="open-chat" data-slot="'+k+'" data-kind="ca">咨询</button>':'<button class="btn mini" data-act="nav" data-slot="'+k+'" data-page="scan">扫码</button>')+'</div></div>'+
+      '<div class="card"><div class="row"><div class="avatar a">'+esc(ag?ag.who.slice(0,1):'—')+'</div><div style="flex:1;margin-left:10px;min-width:0"><div class="vtitle">'+esc(ag?ag.name:'尚未选择服务代理')+'</div><div class="muted">'+esc(ag?ag.area+' · '+ag.tel:'扫谁的码进来，订单就归谁')+'</div></div>'+
+      (ag?'<button class="btn mini" data-act="open-chat" data-slot="'+k+'" data-kind="ca">咨询</button>':((S.settings&&S.settings.chatTarget==='operator')?'<button class="btn mini" data-act="open-chat" data-slot="'+k+'" data-kind="ca">咨询总店</button>':'<button class="btn mini" data-act="nav" data-slot="'+k+'" data-page="scan">扫码</button>'))+'</div></div>'+
       '<div class="notice">'+esc(S.home.notice)+'</div>';
   }
   if(p==='series'){
@@ -13410,7 +13415,7 @@ function renderCustomer(k){
   }
   if(p==='cart'){
     const cart=cartOf(k);
-    if(!cart.length)return empty('选品单还是空的<br>去挑几款烟花吧','bag')+'<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="goods">去选品</button>';
+    if(!cart.length)return empty('购物车还是空的<br>去挑几款烟花吧','bag')+'<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="goods">去选品</button>';
     return '<div class="row between" style="margin-bottom:11px"><span class="muted">共 '+cartCount(k)+' 件</span><span class="link" data-act="clear-cart" data-slot="'+k+'">清空</span></div>'+
       cart.map((c,i)=>{
         const x=c.kid?pkg(c.kid):prod(c.pid);if(!x)return '';
@@ -13427,14 +13432,14 @@ function renderCustomer(k){
   }
   if(p==='checkout'){
     const cart=cartOf(k);
-    if(!cart.length)return empty('选品单是空的','bag')+'<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="goods">去选品</button>';
+    if(!cart.length)return empty('购物车是空的','bag')+'<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="goods">去选品</button>';
     return '<div class="card"><label class="f">姓名 / 超市名头</label><input class="f" data-act="form" data-slot="'+k+'" data-f="who" value="'+esc(sl.form.who)+'" placeholder="姓名或超市名头">'+
       '<label class="f">联系电话</label><input class="f" data-act="form" data-slot="'+k+'" data-f="tel" value="'+esc(sl.form.tel)+'" placeholder="11 位手机号" inputmode="numeric">'+
       '<label class="f">备注</label><textarea class="f" data-act="form" data-slot="'+k+'" data-f="note" placeholder="可写送货地点与时间，例如：预定今晚 3 点把货送到××超市后门">'+esc(sl.form.note)+'</textarea></div>'+
       '<div class="sec"><h3>货品清单</h3><small>'+cartCount(k)+' 件</small></div><div class="card">'+
       cart.map(c=>{const x=c.kid?pkg(c.kid):prod(c.pid);return x?'<div class="kv"><span style="color:var(--ink);font-size:11px">'+esc(x.name)+' <span class="muted">'+esc(c.spec)+' × '+c.qty+'</span></span><b class="num">'+money(x.price*c.qty)+'</b></div>':''}).join('')+
       '<div class="kv" style="border-top:1px solid var(--line);margin-top:6px;padding-top:9px"><span>本次选购合计</span><b class="num" style="font-size:17px">'+money(cartTotal(k))+'</b></div></div>'+
-      '<div class="card"><div class="kv"><span>服务代理</span><b>'+esc(ag?ag.name:'未绑定（归总店）')+'</b></div></div>'+
+      '<div class="card"><div class="kv"><span>服务代理</span><b>'+esc(ag?ag.name:'未指定（归总店）')+'</b></div></div>'+
       '<button class="btn" data-act="submit" data-slot="'+k+'">提交订单</button>'+
       '<div class="notice">提交后由代理与总店备货，货款线下结清。</div>';
   }
@@ -13442,7 +13447,7 @@ function renderCustomer(k){
     const mine=S.orders.filter(o=>o.cu===sl.cu);
     const f=sl.filter||'全部',list=mine.filter(o=>f==='全部'||o.status===f);
     return '<div class="chips">'+['全部','已提交','已确认','已完成','已取消'].map(s=>'<div class="chip '+(f===s?'on':'')+'" data-act="ofilter" data-slot="'+k+'" data-v="'+s+'">'+s+'</div>').join('')+'</div>'+
-      (list.length?list.map(o=>orderCard(k,o,true)).join(''):empty('还没有订单','list'));
+      (list.length?list.map(o=>orderCard(k,o,true)+((o.status==='已提交'||o.status==='已确认')?'<div style="margin:-6px 0 12px"><button class="btn mini ghost" data-act="cancel-order" data-slot="'+k+'" data-no="'+o.no+'">取消订单</button></div>':'')).join(''):empty('还没有订单','list'));
   }
   if(p==='scan')return renderScan(k);
   /* my */
@@ -13450,10 +13455,10 @@ function renderCustomer(k){
   return '<div class="card row">'+avatarFor('customer',c.who)+'<div style="margin-left:11px;flex:1;min-width:0"><div class="vtitle">'+esc(c.who)+'</div><div class="muted">'+esc(c.tel)+' · 微信已登录</div></div><button class="btn mini ghost" data-act="edit-profile" data-slot="'+k+'">编辑</button></div>'+
     '<div class="stat"><div><b>'+myOrders.length+'</b><span>全部订单</span></div><div><b>'+myOrders.filter(o=>o.status==='已提交'||o.status==='已确认').length+'</b><span>进行中</span></div><div><b>'+money(myOrders.filter(o=>o.status!=='已取消').reduce((s,o)=>s+orderAmt(o),0))+'</b><span>累计选购</span></div></div>'+
     '<div class="card hover" data-act="nav" data-slot="'+k+'" data-page="orders"><div class="row between"><span class="vtitle">我的订单</span><span class="link">查看全部 ›</span></div></div>'+
-    '<div class="sec"><h3>我的服务代理</h3></div>'+
+    '<div class="sec"><h3>我的服务代理（扫码即归属，可随时换）</h3></div>'+
     (ag?'<div class="card"><div class="row">'+avatarFor('agent',ag.who)+'<div style="flex:1;margin-left:10px;min-width:0"><div class="vtitle">'+esc(ag.name)+'</div><div class="muted">'+esc(ag.who)+' · '+esc(ag.tel)+'</div><div class="muted">'+esc(ag.area)+'</div></div></div>'+
       '<div class="row" style="gap:7px;margin-top:11px"><button class="btn mini" data-act="open-chat" data-slot="'+k+'" data-kind="ca">发消息</button><button class="btn mini ghost" data-act="call" data-tel="'+esc(ag.tel)+'">拨打电话</button><button class="btn mini ghost" data-act="nav" data-slot="'+k+'" data-page="scan">换代理</button></div></div>'
-      :'<div class="card">'+empty('尚未绑定服务代理','qr')+'<button class="btn" data-act="nav" data-slot="'+k+'" data-page="scan">扫代理二维码</button></div>')+
+      :'<div class="card">'+empty('尚未选择服务代理','qr')+'<button class="btn" data-act="nav" data-slot="'+k+'" data-page="scan">扫代理二维码</button></div>')+
     '<div class="sec"><h3>联系总店</h3></div><div class="card" style="text-align:center">'+
     (S.home.contactQr?'<div style="width:150px;height:150px;margin:10px auto;border-radius:10px;overflow:hidden;background:#F7F3E9;padding:6px"><img src="'+S.home.contactQr+'" alt="商户微信二维码" style="width:100%;height:100%;object-fit:contain;display:block"></div>'
       :'<div class="qr sm">'+qrSVG('tel:'+((agent('AG01')||{}).tel||'13904310001'),96)+'</div>')+
@@ -13471,7 +13476,7 @@ function pcard(k,p){
   return '<div class="card flat hover" data-act="product" data-slot="'+k+'" data-id="'+p.id+'">'+thumb(p)+
     '<div class="pname">'+esc(p.name)+'</div><div class="pcode">'+esc(p.spec)+'</div>'+
     '<div class="row between" style="margin-top:8px"><b class="money" style="font-size:13px">'+money(p.price)+'</b><span class="st '+(out?'off':'ok')+'">'+(out?'缺货':'有货')+'</span></div>'+
-    '<button class="btn mini'+(out?' ghost':'')+'" style="width:100%;margin-top:9px" data-act="quick-add" data-slot="'+k+'" data-id="'+p.id+'"'+(out?' disabled':'')+'>'+(out?'暂时缺货':'加入选品单')+'</button></div>';
+    '<button class="btn mini'+(out?' ghost':'')+'" style="width:100%;margin-top:9px" data-act="quick-add" data-slot="'+k+'" data-id="'+p.id+'"'+(out?' disabled':'')+'>'+(out?'暂时缺货':'加入购物车')+'</button></div>';
 }
 function pkgCard(k,x){
   return '<div class="card hover" data-act="package" data-slot="'+k+'" data-id="'+x.id+'"><div class="row"><div class="vburst">'+burst(x.name.length*137,x.hue,18)+'</div>'+
@@ -13498,8 +13503,8 @@ function renderScan(k){
     '<div class="sec"><h3>选择服务代理</h3><small>'+S.agents.filter(a=>a.on).length+' 位</small></div>'+
     S.agents.filter(a=>a.on).map(a=>'<div class="agent-pick'+(cust(sl.cu).agent===a.id?' on':'')+'" data-act="bind" data-slot="'+k+'" data-id="'+a.id+'">'+
       avatarFor('agent',a.who)+'<div class="ap-c"><div class="ap-n">'+esc(a.name)+(a.self?' <span class="st gold">自营</span>':'')+'</div><div class="ap-s">'+esc(a.area)+' · '+esc(a.tel)+'</div></div>'+
-      (cust(sl.cu).agent===a.id?'<span class="st ok">已绑定</span>':'<span class="link">绑定 ›</span>')+'</div>').join('')+
-    '<div class="notice">绑定后，您的订单将由该代理跟进服务。</div>';
+      (cust(sl.cu).agent===a.id?'<span class="st ok">使用中</span>':'<span class="link">选用 ›</span>')+'</div>').join('')+
+    '<div class="notice">扫谁的码进来，订单就归谁；也可在这里直接选用。换人不用确认，再扫一次即切换。</div>';
 }
 
 function renderDock(){
@@ -13540,13 +13545,13 @@ function renderAgent(k){
       '<div class="bar"><i style="width:'+(st.total?Math.round(st.settled/st.total*100):0)+'%"></i></div>'+
       '<div class="muted" style="margin-top:7px">已结算占比 '+(st.total?Math.round(st.settled/st.total*100):0)+'% · 提成线下与总店核算</div></div>'+
       '<div class="grid2"><button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="orders">处理订单 '+pend.length+'</button>'+
-      '<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="settle">提交账期</button>'+
+      '<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="settle">发结算请求</button>'+
       '<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="chat">消息 '+unreadFor(sl)+'</button>'+
       '<button class="btn ghost" data-act="my-qr" data-slot="'+k+'">我的推广码</button></div>'+
       '<div class="sec"><h3>最近订单</h3><small class="hit" data-act="nav" data-slot="'+k+'" data-page="orders">全部 '+os.length+' ›</small></div>'+
       (recent.length?recent.map(o=>orderCard(k,o,true)).join(''):empty('还没有订单','list'))+
-      '<div class="sec"><h3>账期动态</h3></div>'+
-      (mySet.length?mySet.slice(0,3).map(s=>'<div class="item hover" data-act="settle" data-slot="'+k+'" data-id="'+s.id+'" style="cursor:pointer"><div class="row between"><span class="ttl">'+esc(s.id)+'</span>'+stTag(s.status)+'</div><div class="sub">'+s.orders.length+' 单 · '+money(settleAmt(s))+' · '+esc(s.sub)+'</div></div>').join(''):empty('还没有账期','wallet'));
+      '<div class="sec"><h3>结算动态</h3></div>'+
+      (mySet.length?mySet.slice(0,3).map(s=>'<div class="item hover" data-act="settle" data-slot="'+k+'" data-id="'+s.id+'" style="cursor:pointer"><div class="row between"><span class="ttl">'+esc(s.id)+'</span>'+stTag(s.status)+'</div><div class="sub">'+s.orders.length+' 单 · '+money(settleAmt(s))+' · '+esc(s.sub)+'</div></div>').join(''):empty('还没有结算请求','wallet'));
   }
   if(p==='orders'){
     const f=sl.filter||'全部';let list=agentOrders(sl.agent).filter(o=>f==='全部'||o.status===f);
@@ -13555,32 +13560,33 @@ function renderAgent(k){
     const sel=sl.sel||[];
     return '<div class="searchbar"><input data-act="search" data-slot="'+k+'" value="'+esc(sl.q||'')+'" placeholder="搜索订单号 / 客户 / 备注" aria-label="搜索订单"></div>'+
       '<div class="chips">'+['全部','已提交','已确认','已完成','已取消'].map(s=>'<div class="chip '+(f===s?'on':'')+'" data-act="ofilter" data-slot="'+k+'" data-v="'+s+'">'+s+'</div>').join('')+'</div>'+
-      (unbilled.length?'<div class="card"><div class="row between"><span class="muted">可出账 '+unbilled.length+' 单 · 已选 '+sel.length+' 单</span><span class="link" data-act="sel-all" data-slot="'+k+'">'+(sel.length===unbilled.length?'取消全选':'全选可出账')+'</span></div>'+
-        (sel.length?'<div class="row between" style="margin-top:9px"><b class="money">'+money(sel.reduce((s,no)=>s+orderAmt(order(no)),0))+'</b><button class="btn mini" data-act="make-settle" data-slot="'+k+'">生成账期并提交</button></div>':'')+'</div>':'')+
+      (unbilled.length?'<div class="card"><div class="row between"><span class="muted">未结算 '+unbilled.length+' 单 · 已选 '+sel.length+' 单</span><span class="link" data-act="sel-all" data-slot="'+k+'">'+(sel.length===unbilled.length?'取消全选':'全选未结算')+'</span></div>'+
+        (sel.length?'<div class="row between" style="margin-top:9px"><b class="money">'+money(sel.reduce((s,no)=>s+orderAmt(order(no)),0))+'</b><button class="btn mini" data-act="make-settle" data-slot="'+k+'">发送结算请求</button></div>':'')+'</div>':'')+
       (list.length?list.map(o=>{
         const can=o.settle==='未出账'&&o.status!=='已取消';
         return '<div class="item"><div class="row" style="gap:9px;align-items:flex-start">'+
           (can?'<div class="check '+(sel.includes(o.no)?'on':'')+'" data-act="sel" data-slot="'+k+'" data-no="'+o.no+'" role="checkbox" aria-checked="'+sel.includes(o.no)+'" tabindex="0">'+(sel.includes(o.no)?'✓':'')+'</div>':'<div style="width:17px;flex-shrink:0"></div>')+
-          '<div style="flex:1;min-width:0">'+orderCard(k,o,true).replace('class="item hover"','class="" style="border:0;padding:0;margin:0;background:none"')+'</div></div></div>';
+          '<div style="flex:1;min-width:0">'+orderCard(k,o,true).replace('class="item hover"','class="" style="border:0;padding:0;margin:0;background:none"')+
+          ((o.status==='已提交'||o.status==='已确认')?'<div style="margin-top:7px"><button class="btn mini ghost" data-act="cancel-order" data-slot="'+k+'" data-no="'+o.no+'">取消订单</button></div>':'')+'</div></div>';
       }).join(''):empty('没有匹配的订单','list'));
   }
   if(p==='settle'){
     const list=S.settlements.filter(s=>s.agent===sl.agent);
     const st2=agentStats(sl.agent);
-    return '<div class="stat"><div><b>'+list.length+'</b><span>账期数</span></div><div><b>'+list.filter(s=>s.status==='待结算').length+'</b><span>待总店确认</span></div><div><b>'+money(st2.unbilled)+'</b><span>未出账金额</span></div></div>'+
-      '<button class="btn" data-act="nav" data-slot="'+k+'" data-page="orders">去勾选订单生成账期</button>'+
-      '<div class="sec"><h3>我的账期</h3></div>'+
+    return '<div class="stat"><div><b>'+list.length+'</b><span>结算请求</span></div><div><b>'+list.filter(s=>s.status==='待结算').length+'</b><span>待运营方确认</span></div><div><b>'+money(st2.unbilled)+'</b><span>未结算金额</span></div></div>'+
+      '<button class="btn" data-act="nav" data-slot="'+k+'" data-page="orders">去勾选订单发结算请求</button>'+
+      '<div class="sec"><h3>我的结算请求</h3></div>'+
       (list.length?list.map(s=>'<div class="item hover" data-act="settle" data-slot="'+k+'" data-id="'+s.id+'" style="cursor:pointer"><div class="row between"><span class="ttl">'+esc(s.id)+'</span>'+stTag(s.status)+'</div>'+
         '<div class="sub">'+s.orders.length+' 单 · 提交 '+esc(s.sub)+(s.done?' · 结算 '+esc(s.done):'')+'</div>'+
-        '<div class="row between" style="margin-top:8px"><span class="sub">'+esc(s.memo||'无备注')+'</span><b class="money" style="font-size:13px">'+money(settleAmt(s))+'</b></div></div>').join(''):empty('还没有账期<br>去订单页勾选订单生成','wallet'))+
-      '<div class="notice">账期由您自主决定，可一单一结，也可多单合并；提成线下与总店核算。</div>';
+        '<div class="row between" style="margin-top:8px"><span class="sub">'+esc(s.memo||'无备注')+'</span><b class="money" style="font-size:13px">'+money(settleAmt(s))+'</b></div></div>').join(''):empty('还没有结算请求<br>去订单页勾选未结算订单发送','wallet'))+
+      '<div class="notice">没有固定结账周期：想什么时候结就勾选未结算订单发请求，运营方线下跟您结清后在线上标记已结算；提成线下核算。</div>';
   }
   /* my */
   const cs=S.customers.filter(c=>c.agent===sl.agent);
   return '<div class="card"><div class="row">'+avatarFor('agent',a.who)+'<div style="flex:1;margin-left:11px;min-width:0"><div class="vtitle">'+esc(a.who)+'</div><div class="muted">'+esc(a.name)+' · '+esc(a.tel)+'</div></div></div>'+
     '<div class="kv" style="margin-top:10px"><span>代理编号</span><b class="num">'+esc(a.code)+'</b></div><div class="kv"><span>负责区域</span><b>'+esc(a.area)+'</b></div><div class="kv"><span>加入时间</span><b>'+esc(a.joined)+'</b></div></div>'+
     '<div class="sec"><h3>我的推广码</h3><small class="hit" data-act="my-qr" data-slot="'+k+'">放大 / 保存 ›</small></div>'+
-    '<div class="card" style="text-align:center"><div class="qr">'+qrSVG(agentLink(a.id),150)+'</div><div class="vtitle">客户扫码即绑定我</div><div class="muted" style="margin-top:5px">扫码进入的订单自动归属本代理</div>'+
+    '<div class="card" style="text-align:center"><div class="qr">'+qrSVG(agentLink(a.id),150)+'</div><div class="vtitle">客户扫码进来 · 订单归我</div><div class="muted" style="margin-top:5px">扫谁的码，谁的订单；不用绑定，扫进来就算</div>'+
     '<div class="row" style="gap:7px;margin-top:11px"><button class="btn mini" style="flex:1" data-act="copy-link" data-slot="'+k+'">复制链接</button><button class="btn mini ghost" style="flex:1" data-act="save-qr" data-slot="'+k+'">保存图片</button></div></div>'+
     '<div class="sec"><h3>我的客户</h3><small>'+cs.length+' 位</small></div>'+
     (cs.length?cs.map(c=>{const os=agentOrders(sl.agent).filter(o=>o.cu===c.id);
@@ -13602,11 +13608,11 @@ function renderOperator(k){
     const max=Math.max(1,...byAgent.map(x=>x.st.total));
     return '<div class="stat"><div><b>'+all.length+'</b><span>全部订单</span></div><div><b>'+pend+'</b><span>待确认</span></div><div><b>'+S.agents.filter(a=>a.on).length+'</b><span>启用代理</span></div></div>'+
       '<div class="card"><div class="kv"><span>累计订单金额</span><b class="num" style="font-size:19px">'+money(total)+'</b></div>'+
-      '<div class="kv"><span>待审核账期</span><b class="num">'+pendSet.length+' 笔 · '+money(pendSet.reduce((s,x)=>s+settleAmt(x),0))+'</b></div>'+
+      '<div class="kv"><span>待确认结算请求</span><b class="num">'+pendSet.length+' 笔 · '+money(pendSet.reduce((s,x)=>s+settleAmt(x),0))+'</b></div>'+
       '<div class="kv"><span>在售商品 / 套餐</span><b class="num">'+S.products.filter(x=>x.on).length+' / '+S.packages.filter(x=>x.on).length+'</b></div>'+
       '<div class="kv"><span>客户总数</span><b class="num">'+S.customers.length+'</b></div></div>'+
       '<div class="grid2"><button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="orders">处理订单 '+pend+'</button>'+
-      '<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="settle">审核账期 '+pendSet.length+'</button>'+
+      '<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="settle">结算请求 '+pendSet.length+'</button>'+
       '<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="products">维护商品</button>'+
       '<button class="btn ghost" data-act="nav" data-slot="'+k+'" data-page="chat">代理消息 '+unreadFor(sl)+'</button></div>'+
       '<div class="sec"><h3>代理业绩</h3><small class="hit" data-act="admin-tab" data-slot="'+k+'" data-tab="agents" data-page="manage">代理管理 ›</small></div>'+
@@ -13670,13 +13676,13 @@ function renderOperator(k){
   }
   if(p==='settle'){
     const f=sl.filter||'全部',list=S.settlements.filter(s=>f==='全部'||s.status===f);
-    return '<div class="stat"><div><b>'+S.settlements.length+'</b><span>全部账期</span></div><div><b>'+pendSet.length+'</b><span>待审核</span></div><div><b>'+money(S.settlements.filter(s=>s.status==='已结算').reduce((a,s)=>a+settleAmt(s),0))+'</b><span>已结算</span></div></div>'+
+    return '<div class="stat"><div><b>'+S.settlements.length+'</b><span>全部请求</span></div><div><b>'+pendSet.length+'</b><span>待确认</span></div><div><b>'+money(S.settlements.filter(s=>s.status==='已结算').reduce((a,s)=>a+settleAmt(s),0))+'</b><span>已结算</span></div></div>'+
       '<div class="chips">'+['全部','待结算','已结算'].map(s=>'<div class="chip '+(f===s?'on':'')+'" data-act="ofilter" data-slot="'+k+'" data-v="'+s+'">'+s+'</div>').join('')+'</div>'+
       (list.length?list.map(s=>{const a=agent(s.agent);
         return '<div class="item"><div class="row between" data-act="settle" data-slot="'+k+'" data-id="'+s.id+'" style="cursor:pointer"><span class="ttl">'+esc(s.id)+'</span>'+stTag(s.status)+'</div>'+
         '<div class="sub">'+esc(a?a.name:'')+' · '+s.orders.length+' 单 · 提交 '+esc(s.sub)+'</div>'+
         '<div class="row between" style="margin-top:8px"><span class="sub">'+esc(s.memo||'无备注')+'</span><b class="money" style="font-size:14px">'+money(settleAmt(s))+'</b></div>'+
-        (s.status==='待结算'?'<div class="row" style="gap:7px;margin-top:9px"><button class="btn mini" style="flex:1" data-act="confirm-settle" data-slot="'+k+'" data-id="'+s.id+'">确认结算</button><button class="btn mini ghost" data-act="reject-settle" data-slot="'+k+'" data-id="'+s.id+'">退回</button></div>':'')+'</div>'}).join(''):empty('没有账期','wallet'));
+        (s.status==='待结算'?'<div class="row" style="gap:7px;margin-top:9px"><button class="btn mini" style="flex:1" data-act="confirm-settle" data-slot="'+k+'" data-id="'+s.id+'">线下已打款 · 标记已结算</button></div>':'')+'</div>'}).join(''):empty('没有结算请求','wallet'));
   }
   /* manage */
   const tab=sl.adminTab||'agents';
@@ -13697,7 +13703,7 @@ function renderOperator(k){
       S.customers.filter(c=>!sl.q||(c.who+c.tel).toLowerCase().includes(sl.q.toLowerCase())).map(c=>{
         const os=S.orders.filter(o=>o.cu===c.id),a=agent(c.agent);
         return '<div class="item"><div class="row">'+avatarFor('customer',c.who,true)+'<div style="flex:1;margin-left:9px;min-width:0"><div class="ttl">'+esc(c.who)+'</div>'+
-        '<div class="sub">'+esc(c.tel)+' · '+esc(a?a.name:'未绑定')+'</div><div class="sub">'+os.length+' 单 · '+money(os.filter(o=>o.status!=='已取消').reduce((s,o)=>s+orderAmt(o),0))+' · 访问 '+c.visits+' 次</div></div>'+
+        '<div class="sub">'+esc(c.tel)+' · 服务代理 '+esc(a?a.name:'未指定')+'</div><div class="sub">'+os.length+' 单 · '+money(os.filter(o=>o.status!=='已取消').reduce((s,o)=>s+orderAmt(o),0))+' · 访问 '+c.visits+' 次</div></div>'+
         '<button class="btn mini ghost" data-act="call" data-tel="'+esc(c.tel)+'">电话</button></div>'+
         (c.note?'<div class="sub" style="margin-top:7px">备注：'+esc(c.note)+'</div>':'')+'</div>'}).join('');
   }else if(tab==='home'){
@@ -13707,6 +13713,10 @@ function renderOperator(k){
       '<label class="f">眉标（英文）</label><input class="f" data-act="home" data-slot="'+k+'" data-f="eyebrow" value="'+esc(S.home.eyebrow)+'">'+
       '<label class="f">联系人名头</label><input class="f" data-act="home" data-slot="'+k+'" data-f="qr" value="'+esc(S.home.qr)+'">'+
       '<label class="f">底部说明</label><textarea class="f" data-act="home" data-slot="'+k+'" data-f="notice">'+esc(S.home.notice)+'</textarea></div>'+
+      '<div class="card"><label class="f">客户下单 / 咨询消息发给谁（全站生效）</label>'+
+      '<div class="row" style="gap:7px;margin-top:6px"><button class="btn mini '+(S.settings.chatTarget==='agent'?'':'ghost')+'" data-act="chat-target" data-slot="'+k+'" data-v="agent">服务代理（默认）</button>'+
+      '<button class="btn mini '+(S.settings.chatTarget==='operator'?'':'ghost')+'" data-act="chat-target" data-slot="'+k+'" data-v="operator">运营方直聊</button></div>'+
+      '<div class="muted" style="margin-top:7px;font-size:11px">选「运营方直聊」时，客户提交订单与产品提问直接进「客户 ↔ 总店」会话；订单业绩归属仍看客户扫的码。</div></div>'+
       '<div class="card"><label class="f">宣传图 / 名头图</label><div style="height:82px;border:1px dashed var(--line2);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" data-act="upload" data-slot="'+k+'" data-target="img">'+
       (S.home.img?'<img src="'+S.home.img+'" alt="宣传图" style="width:100%;height:100%;object-fit:cover">':'<span class="muted">点击上传宣传图</span>')+'</div>'+
       '<input type="file" accept="image/*" id="homeFile'+k+'" style="display:none" data-slot="'+k+'" data-target="img">'+
@@ -13726,8 +13736,8 @@ function renderOperator(k){
 /* ======================= 即时通讯 ======================= */
 const QUICK={
   customer:['这款一箱多少盒？','能今晚送到吗？','有没有现货？','帮我算一下总价','我要改一下送货时间'],
-  agent:['库房还有货吗？','这单麻烦优先备货','客户要改送货时间','我提交了个账期，麻烦确认','这个价格能给运费补贴吗？'],
-  operator:['收到，马上备货','库房有货，可以下单','账期已确认，今天打款','稍等，我核实一下','已安排今晚送达']
+  agent:['库房还有货吗？','这单麻烦优先备货','客户要改送货时间','我发了个结算请求，麻烦确认','这个价格能给运费补贴吗？'],
+  operator:['收到，马上备货','库房有货，可以下单','结算请求收到了，今天打款','稍等，我核实一下','已安排今晚送达']
 };
 function renderChat(k){
   const sl=S.ui.slots[k];
@@ -13753,7 +13763,7 @@ function renderChat(k){
   let head='';
   if(sl.role==='customer'){
     const c=cust(sl.cu),a=c?agent(c.agent):null;
-    head='<div class="card"><div class="row">'+avatarFor('agent',a?a.who:'—')+'<div style="flex:1;margin-left:10px;min-width:0"><div class="vtitle">'+esc(a?a.name:'未绑定代理')+'</div><div class="muted">'+esc(a?'产品咨询 · 随时提问':'先扫码绑定服务代理')+'</div></div>'+
+    head='<div class="card"><div class="row">'+avatarFor('agent',a?a.who:'—')+'<div style="flex:1;margin-left:10px;min-width:0"><div class="vtitle">'+esc(a?a.name:'未选服务代理')+'</div><div class="muted">'+esc(a?'产品咨询 · 随时提问':'先扫码或点选服务代理')+'</div></div>'+
       (a?'<button class="btn mini" data-act="open-chat" data-slot="'+k+'" data-kind="ca">发起咨询</button>':'<button class="btn mini" data-act="nav" data-slot="'+k+'" data-page="scan">扫码</button>')+'</div></div>';
   }else if(sl.role==='agent'){
     head='<div class="card"><div class="row">'+avatarFor('operator','张')+'<div style="flex:1;margin-left:10px;min-width:0"><div class="vtitle">运营方 · 张宏伟</div><div class="muted">备货 / 库存 / 结算沟通</div></div>'+
@@ -13764,7 +13774,7 @@ function renderChat(k){
   return head+'<div class="sec"><h3>会话</h3><small>'+(totalUnread?totalUnread+' 条未读':list.length+' 个')+'</small></div>'+
     (list.length?list.map(t=>{
       const m=lastMsg(t),u=t.unread[sl.role]||0;
-      const other=t.kind==='ca'?(sl.role==='customer'?'agent':'customer'):(sl.role==='agent'?'operator':'agent');
+      const other=t.kind==='ca'||t.kind==='co'?(sl.role==='customer'?(t.kind==='co'?'operator':'agent'):'customer'):(sl.role==='agent'?'operator':'agent');
       return '<div class="thread'+(u?' unread':'')+'" data-act="thread" data-slot="'+k+'" data-id="'+t.id+'" tabindex="0" role="button">'+
         avatarFor(other,threadTitle(t,sl.role))+'<div class="tc"><div class="tn"><b>'+esc(threadTitle(t,sl.role))+'</b><time>'+esc(m?relTime(m.t):'')+'</time></div>'+
         '<div class="tp">'+(m?(m.by===sl.role?'我：':'')+esc(m.card?'[产品] ':'')+esc(m.text):'暂无消息')+'</div></div>'+(u?'<span class="ub">'+u+'</span>':'')+'</div>';
@@ -13823,7 +13833,7 @@ function autoReplyText(role,t,text){
   }
   if(role==='operator'){
     if(/货|库存|备货/.test(q))return '库房有货，让客户直接在小程序提交，我看到就确认备货。';
-    if(/账期|结算|打款|财务/.test(q))return '账期收到了，今天一起核，确认后就打款。';
+    if(/账期|结算|打款|财务/.test(q))return '结算请求收到了，今天一起核，确认后就打款。';
     if(/价|补贴|运费/.test(q))return '价格按统一的来，运费补贴这单我批了，你跟客户说一声。';
     return '收到，我这边安排。';
   }
@@ -13867,7 +13877,7 @@ function renderModal(){
       '<b class="money" style="font-size:20px;display:block;margin-top:9px">'+money(x.price)+'</b></div>'+
       '<div class="sec"><h3>包含产品</h3><small>'+x.contains.length+' 项</small></div><div class="card">'+
       x.contains.map(id=>{const p=prod(id);return p?'<div class="kv"><span style="color:var(--ink);font-size:11px">'+esc(p.name)+'</span><b class="num">No.'+esc(p.code)+'</b></div>':''}).join('')+'</div>'+
-      (sl.role==='customer'?'<button class="btn" data-act="add-package" data-slot="'+k+'" data-id="'+x.id+'">整组加入选品单</button>':'<button class="btn ghost" data-act="close">返回</button>');
+      (sl.role==='customer'?'<button class="btn" data-act="add-package" data-slot="'+k+'" data-id="'+x.id+'">整组加入购物车</button>':'<button class="btn ghost" data-act="close">返回</button>');
   }
   else if(m.type==='order'){
     const o=order(d.no);if(!o){closeModal();return}
@@ -13885,23 +13895,23 @@ function renderModal(){
       '<div class="sec"><h3>状态流转</h3></div><div class="timeline"><div>'+esc(o.date)+'　订单已提交</div>'+
       (o.status!=='已提交'&&o.status!=='已取消'?'<div>总店已确认，开始备货</div>':'')+
       (o.status==='已完成'?'<div>订单已完成</div>':'')+(o.status==='已取消'?'<div>订单已取消</div>':'')+
-      (o.settle!=='未出账'?'<div>已出账 '+esc(o.sid||'')+'</div>':'')+(o.settle==='已结算'?'<div>账期已结算</div>':'')+'</div>'+
+      (o.settle!=='未出账'?'<div>已进结算请求 '+esc(o.sid||'')+'</div>':'')+(o.settle==='已结算'?'<div>已随结算请求结清</div>':'')+'</div>'+
       (sl.role==='operator'&&o.status==='已提交'?'<button class="btn" data-act="confirm-order" data-slot="'+k+'" data-no="'+o.no+'">确定 · 开始备货</button>':'')+
       (sl.role!=='operator'?'<button class="btn ghost" data-act="chat-order" data-slot="'+k+'" data-no="'+o.no+'">就这单发消息</button>':'');
   }
   else if(m.type==='settle'){
     const s=settle(d.id);if(!s){closeModal();return}
     const a=agent(s.agent);
-    b='<h3>账期 '+esc(s.id)+'<span class="close" data-act="close">关闭</span></h3>'+
+    b='<h3>结算请求 '+esc(s.id)+'<span class="close" data-act="close">关闭</span></h3>'+
       '<div class="item"><div class="row between"><span class="ttl">'+esc(a?a.name:'')+'</span>'+stTag(s.status)+'</div>'+
       '<div class="kv" style="margin-top:8px"><span>提交时间</span><b>'+esc(s.sub)+'</b></div>'+
       (s.done?'<div class="kv"><span>结算时间</span><b>'+esc(s.done)+'</b></div>':'')+
       '<div class="kv"><span>备注</span><b>'+esc(s.memo||'无')+'</b></div>'+
-      '<div class="kv"><span>账期金额</span><b class="num" style="font-size:17px">'+money(settleAmt(s))+'</b></div></div>'+
+      '<div class="kv"><span>请求金额</span><b class="num" style="font-size:17px">'+money(settleAmt(s))+'</b></div></div>'+
       '<div class="sec"><h3>包含订单</h3><small>'+s.orders.length+' 单</small></div><div class="card">'+
       s.orders.map(no=>{const o=order(no);return o?'<div class="kv"><span style="color:var(--ink);font-size:11px">'+esc(no)+'<br><span class="muted">'+esc((cust(o.cu)||{}).who||'')+'</span></span><b class="num">'+money(orderAmt(o))+'</b></div>':''}).join('')+'</div>'+
-      (sl.role==='operator'&&s.status==='待结算'?'<button class="btn" data-act="confirm-settle" data-slot="'+k+'" data-id="'+s.id+'">确认结算</button><button class="btn ghost" style="margin-top:9px" data-act="reject-settle" data-slot="'+k+'" data-id="'+s.id+'">退回账期</button>':'')+
-      '<div class="notice">账期金额为订单金额合计，提成线下核算。</div>';
+      (sl.role==='operator'&&s.status==='待结算'?'<button class="btn" data-act="confirm-settle" data-slot="'+k+'" data-id="'+s.id+'">线下已打款 · 标记已结算</button>':'')+
+      '<div class="notice">结算请求金额 = 所含订单金额合计（不是提成）；款项线下结清，线上只做标记；有异议直接在线下沟通后处理。</div>';
   }
   else if(m.type==='video'){
     const p=d.id&&d.id!=='HERO'?prod(d.id):null;
@@ -14004,8 +14014,8 @@ function formModal(k,d){
   }
   if(kind==='settle'){
     const nos=d.orders||[],sum=nos.reduce((s,no)=>s+orderAmt(order(no)),0);
-    return '<h3>生成账期<span class="close" data-act="close">关闭</span></h3>'+
-      '<div class="card"><div class="kv"><span>订单数</span><b class="num">'+nos.length+' 单</b></div><div class="kv"><span>账期金额</span><b class="num" style="font-size:17px">'+money(sum)+'</b></div></div>'+
+    return '<h3>发起结算请求<span class="close" data-act="close">关闭</span></h3>'+
+      '<div class="card"><div class="kv"><span>订单数</span><b class="num">'+nos.length+' 单</b></div><div class="kv"><span>请求金额</span><b class="num" style="font-size:17px">'+money(sum)+'</b></div></div>'+
       '<div class="card" style="max-height:200px;overflow-y:auto">'+nos.map(no=>{const o=order(no);return '<div class="kv"><span style="color:var(--ink);font-size:11px">'+esc(no)+'</span><b class="num">'+money(orderAmt(o))+'</b></div>'}).join('')+'</div>'+
       '<div class="card"><label class="f">备注（给总店）</label><input class="f" data-form="memo" placeholder="如 11月第一批，微信转账"></div>'+
       '<button class="btn" data-act="save-form" data-slot="'+k+'" data-kind="settle">提交给运营方</button>';
@@ -14052,36 +14062,49 @@ document.addEventListener('click',e=>{
     case 'noop':{break}
     case 'add':{addToCart(k,id,el.dataset.spec||'单件');break}
     case 'quick-add':{const p=prod(id);const spec=['单件','单组','单品'].find(s=>canBuy(p,s))||'单件';addToCart(k,id,spec);break}
-    case 'add-package':{const c=cartOf(k).find(x=>x.kid===id);if(c)c.qty++;else cartOf(k).push({kid:id,spec:'套餐',qty:1});closeModal();renderSlot(k);toast('套餐已加入选品单');Sound.play('add');break}
+    case 'add-package':{const c=cartOf(k).find(x=>x.kid===id);if(c)c.qty++;else cartOf(k).push({kid:id,spec:'套餐',qty:1});closeModal();renderSlot(k);toast('套餐已加入购物车');Sound.play('add');break}
     case 'qty':{const i=+el.dataset.i,c=cartOf(k)[i];if(!c)break;const x=c.kid?pkg(c.kid):prod(c.pid);const max=c.kid?99:stockOf(x,c.spec);c.qty=Math.min(max,c.qty+ +el.dataset.d);if(c.qty<=0)cartOf(k).splice(i,1);renderSlot(k);break}
     case 'del-cart':{const i=+el.dataset.i,removed=cartOf(k).splice(i,1)[0];renderSlot(k);setUndo('已移除 1 项',()=>{cartOf(k).splice(i,0,removed)});break}
-    case 'clear-cart':{const old=cartOf(k).slice();CART[k]=[];renderSlot(k);setUndo('选品单已清空',()=>{CART[k]=old});break}
+    case 'clear-cart':{const old=cartOf(k).slice();CART[k]=[];renderSlot(k);setUndo('购物车已清空',()=>{CART[k]=old});break}
     case 'submit':{submitOrder(k);break}
     case 'ofilter':{sl.filter=el.dataset.v;renderSlot(k);break}
     case 'confirm-order':{const o=order(no);o.status='已确认';logEvent('订单确认备货',no+' · '+((cust(o.cu)||{}).who||''),'运营方');closeModal();renderAll();toast('已确认，开始备货');Sound.play('ok');notifyOrder(o,'总店已确认您的订单，正在备货');break}
     case 'finish-order':{const o=order(no);o.status='已完成';logEvent('订单完成',no,'运营方');renderAll();toast('订单已完成');Sound.play('ok');break}
-    case 'cancel-order':{const o=order(no);openModal(k,'confirm',{title:'取消订单',body:'确定取消 '+no+' 吗？取消后可在列表查看。',ok:'取消订单',fn:()=>{o.status='已取消';logEvent('订单取消',no,'运营方');renderAll();toast('订单已取消')}});break}
+    case 'cancel-order':{const o=order(no);openModal(k,'confirm',{title:'取消订单',body:'确定取消 '+no+' 吗？客户、代理、总店三方都会收到通知。',ok:'取消订单',fn:()=>{
+      o.status='已取消';const by=sl.role,byName={customer:'客户',agent:'代理',operator:'总店'}[by]||by;
+      logEvent('订单取消',no,ROLE_NAME[by]||by);renderAll();toast('订单已取消，已通知另外两方');Sound.play('tap');
+      const tgt=S.settings.chatTarget||'agent';
+      const ct=tgt==='agent'?ensureThread('ca',o.cu,o.agent,null):ensureThread('co',o.cu,null,null);
+      pushMsg(ct,by,'订单 '+no+' 已被'+byName+'取消。');
+      const at=ensureThread('ao',null,o.agent);pushMsg(at,by,'订单 '+no+' 已被'+byName+'取消。');
+    }});break}
     case 'confirm-yes':{const fn=sl.modal&&sl.modal.data.fn;closeModal();if(fn)fn();break}
     case 'sel':{const s=sl.sel||[];sl.sel=s.includes(no)?s.filter(x=>x!==no):[...s,no];renderSlot(k);break}
     case 'sel-all':{const un=agentOrders(sl.agent).filter(o=>o.settle==='未出账'&&o.status!=='已取消').map(o=>o.no);sl.sel=(sl.sel||[]).length===un.length?[]:un;renderSlot(k);break}
     case 'make-settle':{if(!(sl.sel||[]).length){toast('先勾选订单');break}openModal(k,'form',{kind:'settle',orders:sl.sel.slice()});break}
-    case 'confirm-settle':{const s=settle(id);s.status='已结算';s.done=nowStamp();s.orders.forEach(n=>{const o=order(n);if(o)o.settle='已结算'});logEvent('结算单确认',s.id+' · '+money(settleAmt(s)),'运营方');closeModal();renderAll();toast('账期已结算');Sound.play('coin');pushSystemMsg(s.agent,'operator','账期 '+s.id+' 已确认结算，金额 '+money(settleAmt(s))+'，款项线下打给您。');break}
-    case 'reject-settle':{const s=settle(id);openModal(k,'confirm',{title:'退回账期',body:'退回 '+s.id+' 后，其中订单回到未出账状态，代理可重新组账期。',ok:'退回',fn:()=>{s.orders.forEach(n=>{const o=order(n);if(o){o.settle='未出账';o.sid=null}});S.settlements=S.settlements.filter(x=>x.id!==s.id);logEvent('账期退回',s.id,'运营方');renderAll();toast('账期已退回');pushSystemMsg(s.agent,'operator','账期 '+s.id+' 被退回，请核对后重新提交。')}});break}
+    case 'confirm-settle':{const s=settle(id);s.status='已结算';s.done=nowStamp();s.orders.forEach(n=>{const o=order(n);if(o)o.settle='已结算'});logEvent('结算请求确认',s.id+' · '+money(settleAmt(s)),'运营方');closeModal();renderAll();toast('已标记为已结算');Sound.play('coin');pushSystemMsg(s.agent,'operator','结算请求 '+s.id+' 已结清（'+money(settleAmt(s))+'），款项线下打给您，订单已标记已结算。');break}
+    case 'chat-target':{S.settings.chatTarget=el.dataset.v==='operator'?'operator':'agent';save();renderAll();toast('客户消息对象：'+(S.settings.chatTarget==='agent'?'服务代理':'运营方直聊'));break}
     case 'thread':{sl.thread=id;sl.page='chat';markRead(thread(id),sl.role);renderSlot(k);scrollChat(k);break}
     case 'thread-open':{break}
     case 'chat-back':{sl.thread=null;renderSlot(k);break}
     case 'send':{const ta=$('#chatInput'+k);sendMsg(k,ta?ta.value:sl.chatDraft);break}
     case 'quick-msg':{sendMsg(k,el.dataset.t);break}
     case 'open-chat':{const kind=el.dataset.kind;let t;
-      if(kind==='ca'){const c=cust(sl.cu);if(!c.agent){toast('请先扫码绑定代理');sl.page='scan';renderSlot(k);break}t=ensureThread('ca',c.id,c.agent,null)}
+      const ct=S.settings.chatTarget||'agent';
+      if(kind==='ca'&&sl.role==='customer'){
+        if(ct==='agent'){const c=cust(sl.cu);if(!c.agent){toast('请先扫代理二维码或点选服务代理');sl.page='scan';renderSlot(k);break}t=ensureThread('ca',c.id,c.agent,null)}
+        else t=ensureThread('co',sl.cu,null,null);
+      }
       else{const ag=sl.role==='agent'?sl.agent:(S.agents.find(x=>x.on&&!x.self)||S.agents[0]).id;t=ensureThread('ao',null,ag)}
       sl.thread=t.id;sl.page='chat';markRead(t,sl.role);renderSlot(k);scrollChat(k);break}
-    case 'ask-product':{const c=cust(sl.cu);if(!c.agent){closeModal();toast('请先扫码绑定代理');sl.page='scan';renderSlot(k);break}
-      const t=ensureThread('ca',c.id,c.agent,id);sl.thread=t.id;sl.page='chat';closeModal();markRead(t,sl.role);
+    case 'ask-product':{const c=cust(sl.cu);const ct=S.settings.chatTarget||'agent';
+      if(ct==='agent'&&!c.agent){closeModal();toast('请先扫代理二维码或点选服务代理');sl.page='scan';renderSlot(k);break}
+      const t=ct==='agent'?ensureThread('ca',c.id,c.agent,id):ensureThread('co',c.id,null,null);sl.thread=t.id;sl.page='chat';closeModal();markRead(t,sl.role);
       pushMsg(t,'customer','想了解一下这款',({type:'product',id}));renderSlot(k);scrollChat(k);if(S.ui.rail.autoReply)scheduleReply(t,'customer');break}
     case 'chat-cu':{const c=cust(el.dataset.cu);const t=ensureThread('ca',c.id,c.agent,null);sl.thread=t.id;sl.page='chat';markRead(t,sl.role);renderSlot(k);scrollChat(k);break}
     case 'chat-agent':{const t=ensureThread('ao',null,id);sl.thread=t.id;sl.page='chat';markRead(t,sl.role);renderSlot(k);scrollChat(k);break}
-    case 'chat-order':{const o=order(no);let t;if(sl.role==='customer')t=ensureThread('ca',o.cu,o.agent,null);else t=ensureThread('ao',null,o.agent);
+    case 'chat-order':{const o=order(no);let t;const ct=S.settings.chatTarget||'agent';
+      if(sl.role==='customer')t=ct==='agent'?ensureThread('ca',o.cu,o.agent,null):ensureThread('co',o.cu,null,null);else t=ensureThread('ao',null,o.agent);
       sl.thread=t.id;sl.page='chat';closeModal();markRead(t,sl.role);pushMsg(t,sl.role,'关于订单 '+no+'：',null);renderSlot(k);scrollChat(k);break}
     case 'bind':{bindAgent(k,id);break}
     case 'simulate-scan':{closeModal();const ka=S.ui.slots.A.role==='customer'?'A':'B';bindAgent(ka,id,true);break}
@@ -14173,11 +14196,11 @@ function addToCart(k,id,spec){
   const p=prod(id);if(!p||!canBuy(p,spec)){toast('该规格暂时缺货');return}
   const c=cartOf(k).find(x=>x.pid===id&&x.spec===spec);
   if(c){if(c.qty>=stockOf(p,spec)){toast('已达该规格库存上限');return}c.qty++}else cartOf(k).push({pid:id,spec,qty:1});
-  closeModal();renderSlot(k);toast('已加入选品单 · '+spec);Sound.play('add');
+  closeModal();renderSlot(k);toast('已加入购物车 · '+spec);Sound.play('add');
 }
 function submitOrder(k){
   const sl=S.ui.slots[k],c=cust(sl.cu),cart=cartOf(k);
-  if(!cart.length){toast('选品单是空的');return}
+  if(!cart.length){toast('购物车是空的');return}
   if(!String(sl.form.who||'').trim()){toast('请填写姓名或超市名头');return}
   if(!/^1\d{10}$/.test(String(sl.form.tel||'').trim())){toast('请填写 11 位手机号');return}
   const no='HW'+nowStamp().slice(2,10).replace(/-/g,'')+String(S.orders.length+1).padStart(3,'0');
@@ -14189,11 +14212,10 @@ function submitOrder(k){
   logEvent('新订单提交',no+' · '+(agent(o.agent)||{}).name,'客户 '+c.who);
   Sound.play('submit');Sky.celebrate();
   renderAll();toast('订单已提交 · '+no);
-  const t=ensureThread('ca',c.id,o.agent,null);
+  const tgt=S.settings.chatTarget||'agent';
+  const t=tgt==='agent'?ensureThread('ca',c.id,o.agent,null):ensureThread('co',c.id,null,null);
   pushMsg(t,'customer','我刚提交了订单 '+no+'，合计 '+money(orderAmt(o))+'。'+(o.note!=='（未填）'?'备注：'+o.note:''),null);
-  const ta=ensureThread('ao',null,o.agent);
-  pushMsg(ta,'agent','新单 '+no+'（'+c.who+'）已提交，合计 '+money(orderAmt(o))+'，麻烦确认备货。');
-  notifyOrder(o,'您的订单已提交，代理与总店已收到');
+  notifyOrder(o,'您的订单已提交，已收到，会尽快备货');
 }
 function notifyOrder(o,text){
   ['A','B'].forEach(x=>{const s=S.ui.slots[x];if(s.role==='agent'&&s.agent===o.agent)snack('新订单 '+o.no,text,()=>{s.page='orders';s.filter='已提交';renderSlot(x)})});
@@ -14202,9 +14224,9 @@ function pushSystemMsg(ag,by,text){const t=ensureThread('ao',null,ag);pushMsg(t,
 function bindAgent(k,id,fromScan){
   const sl=S.ui.slots[k],c=cust(sl.cu),a=agent(id);if(!a||!a.on){toast('该代理已停用');return}
   const old=c.agent;c.agent=id;c.visits++;
-  S.ui.bindFlash=id;logEvent('客户绑定代理',c.who+' → '+a.name,fromScan?'扫码':'手动');
+  S.ui.bindFlash=id;logEvent('扫码进入 · 订单归属',c.who+' → '+a.name,fromScan?'扫码':'点选');
   sl.page='home';renderAll();Sound.play('bind');Sky.celebrate(a.hue);
-  toast((fromScan?'扫码成功 · ':'')+'已绑定 '+a.name+(old&&old!==id?'（原 '+(agent(old)||{}).name+'）':''));
+  toast((fromScan?'扫码成功 · ':'')+'服务代理：'+a.name+'，之后的订单归 '+a.name+(old&&old!==id?'（原 '+(agent(old)||{}).name+'）':''));
   const t=ensureThread('ca',c.id,id,null);
   if(!t.msgs.length)pushMsg(t,'agent','您好，我是'+a.who+'，'+a.name+'。看产品有任何问题直接在这里问我，下单后我跟总店给您备货。');
   renderAll();
@@ -14244,13 +14266,13 @@ function saveForm(k,kind,id){
     closeModal();renderSlot(k);toast('视图已保存');
   }else if(kind==='settle'){
     const nos=(sl.modal.data.orders||[]).filter(n=>{const o=order(n);return o&&o.settle==='未出账'});
-    if(!nos.length){toast('没有可出账的订单');closeModal();return}
+    if(!nos.length){toast('这些订单已在结算请求里');closeModal();return}
     const sid='ST'+nowStamp().slice(2,10).replace(/-/g,'')+String(S.settlements.length+1).padStart(2,'0');
     S.settlements.unshift({id:sid,agent:sl.agent,orders:nos,status:'待结算',sub:nowStamp(),done:null,memo:String(d.memo||'').trim()});
     nos.forEach(n=>{const o=order(n);o.settle='已出账';o.sid=sid});
-    sl.sel=[];logEvent('账期提交',sid+' · '+money(nos.reduce((s,n)=>s+orderAmt(order(n)),0)),'代理 '+(agent(sl.agent)||{}).name);
-    closeModal();sl.page='settle';renderAll();toast('账期已提交给运营方');Sound.play('coin');
-    pushSystemMsg(sl.agent,'agent','我提交了账期 '+sid+'，共 '+nos.length+' 单，金额 '+money(nos.reduce((s,n)=>s+orderAmt(order(n)),0))+'，麻烦确认。');
+    sl.sel=[];logEvent('结算请求提交',sid+' · '+money(nos.reduce((s,n)=>s+orderAmt(order(n)),0)),'代理 '+(agent(sl.agent)||{}).name);
+    closeModal();sl.page='settle';renderAll();toast('结算请求已发送给运营方');Sound.play('coin');
+    pushSystemMsg(sl.agent,'agent','我发起了结算请求 '+sid+'，共 '+nos.length+' 单，金额 '+money(nos.reduce((s,n)=>s+orderAmt(order(n)),0))+'，麻烦线下结清后标记已结算。');
   }
 }
 function copyText(t){
@@ -14274,7 +14296,7 @@ function exportCSV(k){
   if(sl.filter&&sl.filter!=='全部')list=list.filter(o=>o.status===sl.filter);
   if(sl.agentFilter&&sl.agentFilter!=='全部')list=list.filter(o=>o.agent===sl.agentFilter);
   const rows=[['订单号','客户','电话','代理','状态','结算','金额','下单时间','备注','货品']];
-  list.forEach(o=>{const c=cust(o.cu)||{};rows.push([o.no,c.who||'',c.tel||'',(agent(o.agent)||{}).name||'',o.status,o.settle,orderAmt(o),o.date,o.note,o.items.map(i=>itemName(i)+'('+i.spec+')x'+i.qty).join('; ')])});
+  list.forEach(o=>{const c=cust(o.cu)||{};rows.push([o.no,c.who||'',c.tel||'',(agent(o.agent)||{}).name||'',o.status,settleLabel(o.settle),orderAmt(o),o.date,o.note,o.items.map(i=>itemName(i)+'('+i.spec+')x'+i.qty).join('; ')])});
   const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const b=new Blob([csv],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),l=document.createElement('a');l.href=u;l.download='订单导出-'+nowStamp().slice(0,10)+'.csv';l.click();setTimeout(()=>URL.revokeObjectURL(u),1500);
   toast('已导出 '+list.length+' 单');
@@ -14504,7 +14526,9 @@ function seedOrder(){
   const o={no,cu:c.id,agent:c.agent,status:'已提交',settle:'未出账',sid:null,date:nowStamp(),note:'加急备货，尽快电话联系',items:picks.map(x=>({pid:x.id,spec:'单件',qty:1+Math.floor(Math.random()*2),price:x.price}))};
   S.orders.unshift(o);logEvent('新订单提交',no+' · '+(agent(c.agent)||{}).name,'客户 '+c.who);
   renderAll();Sound.play('submit');Sky.celebrate();toast('已造订单 '+no);
-  const t=ensureThread('ao',null,c.agent);pushMsg(t,'agent','新单 '+no+'（'+c.who+'）'+money(orderAmt(o))+'，麻烦确认备货。');renderAll();
+  const tgt=S.settings.chatTarget||'agent';
+  const t=tgt==='agent'?ensureThread('ca',c.id,c.agent,null):ensureThread('co',c.id,null,null);
+  pushMsg(t,'customer','我刚提交了订单 '+no+'，合计 '+money(orderAmt(o))+'。备注：'+o.note);renderAll();
 }
 function seedMsg(){
   const cs=S.customers.filter(c=>c.agent),c=cs[Math.floor(Math.random()*cs.length)],p=S.products[Math.floor(Math.random()*S.products.length)];
